@@ -1,0 +1,32 @@
+[build]
+builder = "NIXPACKS"
+
+[[services]]
+name = "backend"
+rootDirectory = "backend"
+
+[services.build]
+buildCommand = "npm install && npm run build"
+
+[services.deploy]
+startCommand = "npm run start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+
+[[services.variables]]
+name = "NODE_ENV"
+value = "production"
+
+[[services]]
+name = "frontend"
+rootDirectory = "frontend"
+
+[services.build]
+buildCommand = "npm install && npm run build"
+
+[services.deploy]
+startCommand = "npx serve -s dist -l $PORT"
+
+[[services.variables]]
+name = "VITE_API_URL"
+value = "${{ services.backend.RAILWAY_PUBLIC_DOMAIN }}"

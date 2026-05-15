@@ -1,0 +1,121 @@
+export type Lang = 'en' | 'he';
+
+type T = { [key: string]: string };
+
+const en: T = {
+  // Nav
+  nav_dash: 'Dashboard', nav_lists: 'Lists', nav_alerts: 'Alerts', nav_team: 'Team', nav_settings: 'Settings',
+  // Common
+  loading: 'Loading...', save: 'Save', saving: 'Saving...', cancel: 'Cancel',
+  members: 'members', sublists_label: 'sublists',
+  // Login
+  welcome_back: 'Welcome back', sign_in_sub: 'Sign into your workspace',
+  email_ph: 'Email', password_ph: 'Password',
+  sign_in: 'Sign in', signing_in: 'Signing in...',
+  no_account: "Don't have an account?", create_one: 'Create one',
+  // Register
+  create_account: 'Create account', create_account_sub: 'Set up your workspace',
+  name_ph: 'Your name', creating: 'Creating...',
+  have_account: 'Already have an account?', reg_failed: 'Registration failed',
+  // Invite popup
+  youre_invited: "You've been invited!", invite_message: 'You have a pending invite to join',
+  invite_as: 'as a', join_workspace: 'Join', joining: 'Joining...',
+  skip_invite: 'Skip, use my own workspace',
+  // Dashboard
+  good_morning: 'Good morning', good_afternoon: 'Good afternoon', good_evening: 'Good evening',
+  total_tasks: 'Total tasks', completed: 'Completed', open: 'Open',
+  filter_all: 'All', filter_mine: 'Mine', filter_due_today: 'Due today', filter_overdue: 'Overdue',
+  nothing_here: 'Nothing here', no_tasks_filter: 'No tasks match this filter',
+  overdue_badge: 'Overdue', due_soon_badge: 'Due soon',
+  // Lists
+  my_lists: 'My lists', shared_section: 'Shared', private_section: 'Private',
+  search_ph: 'Search tasks...', results: 'results', result: 'result',
+  no_tasks_match: 'No tasks match', no_lists: 'No lists yet',
+  no_lists_sub: 'Create your first list to start organizing tasks with your team.',
+  create_list_btn: 'Create a list', new_list: 'New list', name_label: 'Name',
+  emoji_label: 'Emoji', shared_with_team: 'Shared with team', create_list: 'Create list',
+  done_badge: 'Done', tasks_badge: 'tasks', empty_badge: 'Empty',
+  list_ph: 'e.g. Q3 Roadmap',
+  // ListDetail
+  back_lists: 'Lists', no_tasks_yet: 'No tasks yet',
+  add_task_sublist: 'Add sublist or task...', add_to: 'Add to',
+  type_task: 'Task', type_sublist: 'Sublist',
+  single_todo: 'A single to-do', group_tasks: 'A group of tasks',
+  task_name: 'Task name', sublist_name: 'Sublist name',
+  task_ph: 'What needs to be done?', sublist_ph: 'e.g. Design',
+  add_to_sublist: 'Add to sublist (optional)', none: 'None',
+  assignee_opt: 'Assignee (optional)', add_task: 'Add task', add_sublist: 'Add sublist',
+  soon_badge: 'Soon', filter_open: 'Open', filter_done: 'Done',
+  // TaskDetail
+  notes_label: 'Notes', notes_ph: 'Add notes...',
+  assignee_label: 'Assignee', unassigned: 'Unassigned', due_date: 'Due date',
+  sublist_label: 'Sublist', no_sublist: 'No sublist', delete_confirm: 'Delete this task?',
+  // Notifications
+  alerts: 'Alerts', today: 'Today', earlier: 'Earlier', no_notifs: 'No notifications',
+  // Team
+  team: 'Team', workspace_members: 'Workspace members', all_members: 'All members',
+  pending_invites: 'Pending invites', invite_to_ws: 'Invite to workspace',
+  email_address: 'Email address', role_label: 'Role',
+  member_role: 'Member', admin_role: 'Admin',
+  member_desc: 'Can view and edit tasks', admin_desc: 'Can also manage members',
+  send_invite: 'Send invite', sending: 'Sending...', invite_sent: '✅ Invite sent!',
+  active: 'Active', away: 'Away', active_lists: 'active lists',
+  pending_badge: 'Pending', cancel_invite: 'Cancel invite', log_out: 'Log out',
+  // Settings
+  settings: 'Settings', appearance: 'Appearance', dark_mode: 'Dark mode',
+  language: 'Language', hebrew: 'Hebrew (עברית)',
+};
+
+const he: T = {
+  nav_dash: 'לוח בקרה', nav_lists: 'רשימות', nav_alerts: 'התראות', nav_team: 'צוות', nav_settings: 'הגדרות',
+  loading: 'טוען...', save: 'שמור', saving: 'שומר...', cancel: 'ביטול',
+  members: 'חברים', sublists_label: 'תת-רשימות',
+  welcome_back: 'ברוך השב', sign_in_sub: 'התחבר לסביבת העבודה',
+  email_ph: 'מייל', password_ph: 'סיסמה',
+  sign_in: 'התחבר', signing_in: 'מתחבר...',
+  no_account: 'אין לך חשבון?', create_one: 'צור חשבון',
+  create_account: 'צור חשבון', create_account_sub: 'הגדר את סביבת העבודה',
+  name_ph: 'שמך', creating: 'יוצר...',
+  have_account: 'יש לך כבר חשבון?', reg_failed: 'הרישום נכשל',
+  youre_invited: '!הוזמנת', invite_message: 'יש לך הזמנה להצטרף ל',
+  invite_as: 'בתור', join_workspace: 'הצטרף ל', joining: 'מצטרף...',
+  skip_invite: 'דלג, השתמש בסביבה שלי',
+  good_morning: 'בוקר טוב', good_afternoon: 'צהריים טובים', good_evening: 'ערב טוב',
+  total_tasks: 'סה״כ משימות', completed: 'הושלמו', open: 'פתוחות',
+  filter_all: 'הכל', filter_mine: 'שלי', filter_due_today: 'להיום', filter_overdue: 'באיחור',
+  nothing_here: 'אין כלום כאן', no_tasks_filter: 'אין משימות מתאימות לסינון',
+  overdue_badge: 'באיחור', due_soon_badge: 'בקרוב',
+  my_lists: 'הרשימות שלי', shared_section: 'משותפות', private_section: 'פרטיות',
+  search_ph: 'חפש משימות...', results: 'תוצאות', result: 'תוצאה',
+  no_tasks_match: 'אין משימות שמתאימות', no_lists: 'אין רשימות עדיין',
+  no_lists_sub: '.צור את הרשימה הראשונה שלך כדי לארגן משימות עם הצוות',
+  create_list_btn: 'צור רשימה', new_list: 'רשימה חדשה', name_label: 'שם',
+  emoji_label: "אמוג'י", shared_with_team: 'משותפת עם הצוות', create_list: 'צור רשימה',
+  done_badge: 'הושלם', tasks_badge: 'משימות', empty_badge: 'ריק',
+  list_ph: 'לדוגמה: מפת דרכים',
+  back_lists: 'רשימות', no_tasks_yet: 'אין משימות עדיין',
+  add_task_sublist: '...הוסף תת-רשימה או משימה', add_to: 'הוסף ל',
+  type_task: 'משימה', type_sublist: 'תת-רשימה',
+  single_todo: 'מטלה בודדת', group_tasks: 'קבוצת משימות',
+  task_name: 'שם המשימה', sublist_name: 'שם תת-הרשימה',
+  task_ph: 'מה צריך לעשות?', sublist_ph: 'לדוגמה: עיצוב',
+  add_to_sublist: 'הוסף לתת-רשימה (אופציונלי)', none: 'ללא',
+  assignee_opt: 'אחראי (אופציונלי)', add_task: 'הוסף משימה', add_sublist: 'הוסף תת-רשימה',
+  soon_badge: 'בקרוב', filter_open: 'פתוחות', filter_done: 'הושלמו',
+  notes_label: 'הערות', notes_ph: 'הוסף הערות...',
+  assignee_label: 'אחראי', unassigned: 'לא מוקצה', due_date: 'תאריך יעד',
+  sublist_label: 'תת-רשימה', no_sublist: 'ללא תת-רשימה', delete_confirm: 'למחוק את המשימה?',
+  alerts: 'התראות', today: 'היום', earlier: 'קודם', no_notifs: 'אין התראות',
+  team: 'צוות', workspace_members: 'חברי הסביבה', all_members: 'כל החברים',
+  pending_invites: 'הזמנות ממתינות', invite_to_ws: 'הזמן לסביבה',
+  email_address: 'כתובת מייל', role_label: 'תפקיד',
+  member_role: 'חבר', admin_role: 'מנהל',
+  member_desc: 'יכול לצפות ולערוך משימות', admin_desc: 'יכול גם לנהל חברים',
+  send_invite: 'שלח הזמנה', sending: 'שולח...', invite_sent: '✅ ההזמנה נשלחה!',
+  active: 'פעיל', away: 'לא זמין', active_lists: 'רשימות פעילות',
+  pending_badge: 'ממתין', cancel_invite: 'בטל הזמנה', log_out: 'התנתק',
+  settings: 'הגדרות', appearance: 'מראה', dark_mode: 'מצב כהה',
+  language: 'שפה', hebrew: 'עברית',
+};
+
+export const translations: Record<Lang, T> = { en, he };
