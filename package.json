@@ -24,59 +24,13 @@
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",
     "docker:up:build": "docker-compose up --build",
-    "docker:logs": "docker-compose logs -f",
-    "docker:logs:backend": "docker-compose logs -f backend",
-    "docker:logs:frontend": "docker-compose logs -f frontend",
-    "docker:logs:postgres": "docker-compose logs -f postgres",
-    "db:migrate": "docker-compose exec backend npm run build && docker-compose exec backend node -e \"require('pg').Pool({connectionString: process.env.DATABASE_URL}).query(require('fs').readFileSync('./migrations/001_init.sql', 'utf8')).then(() => console.log('Migrated!')).catch(console.error)\"",
-    "db:seed": "docker-compose exec backend node -e \"console.log('Seeding database...')\"",
-    "db:reset": "npm run docker:down && docker volume rm shared-todo-app_postgres_data && npm run docker:up:build",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "npm --prefix backend run test 2>/dev/null || echo 'No tests configured'",
-    "test:frontend": "npm --prefix frontend run test 2>/dev/null || echo 'No tests configured'",
-    "lint": "npm run lint:backend && npm run lint:frontend",
-    "lint:backend": "npm --prefix backend run lint 2>/dev/null || echo 'No linter configured'",
-    "lint:frontend": "npm --prefix frontend run lint 2>/dev/null || echo 'No linter configured'",
-    "clean": "rm -rf backend/dist frontend/dist backend/node_modules frontend/node_modules node_modules",
-    "clean:docker": "docker-compose down -v",
-    "reset": "npm run clean && npm run clean:docker && npm run install:all",
-    "docs": "echo '📚 Project Documentation:' && echo '  - CLAUDE.md: Architecture & design docs' && echo '  - README.md: Setup & features' && echo '  - BUILD_SUMMARY.md: What was built'",
-    "status": "echo '📊 Project Status:' && echo '  Backend: src/ → dist/ (Express + TypeScript)' && echo '  Frontend: src/ → dist/ (React + Vite)' && echo '  Database: PostgreSQL (migrations/ folder)' && echo '  Docker: docker-compose.yml configured'",
-    "help": "echo '🔧 Available Commands:' && echo '' && echo '📦 Installation:' && echo '  npm run install:all     - Install all dependencies' && echo '' && echo '⚙️  Development:' && echo '  npm run dev             - Run backend & frontend together' && echo '  npm run dev:backend     - Run backend only (port 3001)' && echo '  npm run dev:frontend    - Run frontend only (port 5173)' && echo '' && echo '🔨 Build & Production:' && echo '  npm run build           - Build both backend & frontend' && echo '  npm run build:backend   - Build backend only' && echo '  npm run build:frontend  - Build frontend only' && echo '  npm run start           - Start production servers' && echo '' && echo '🐳 Docker:' && echo '  npm run docker:up       - Start services (compose up)' && echo '  npm run docker:down     - Stop services (compose down)' && echo '  npm run docker:up:build - Rebuild & start' && echo '  npm run docker:logs     - View all logs' && echo '  npm run db:reset        - Reset database' && echo '' && echo '✅ Quality:' && echo '  npm run typecheck       - TypeScript check (all)' && echo '  npm run test            - Run tests (if configured)' && echo '  npm run lint            - Run linters (if configured)' && echo '' && echo '🧹 Cleanup:' && echo '  npm run clean           - Remove dist, node_modules' && echo '  npm run clean:docker    - Stop & remove Docker volumes' && echo '  npm run reset           - Full clean slate' && echo '' && echo '📖 Info:' && echo '  npm run docs            - Show documentation files' && echo '  npm run status          - Show project structure' && echo '  npm run help            - Show this help message'",
-    "scripts-info": {
-      "install:all": "Installs dependencies for root, backend, and frontend",
-      "dev": "Runs backend (3001) and frontend (5173) in parallel",
-      "dev:backend": "Backend development server (Express, hot-reload with tsx watch)",
-      "dev:frontend": "Frontend dev server (Vite, HMR enabled)",
-      "build": "Builds both backend (TypeScript → JavaScript) and frontend (Vite bundle)",
-      "start": "Runs production servers (backend + frontend)",
-      "docker:up": "Starts PostgreSQL, backend, frontend via docker-compose",
-      "docker:down": "Stops all services",
-      "docker:up:build": "Rebuilds images and starts services",
-      "docker:logs": "Streams logs from all services",
-      "db:reset": "Drops and recreates PostgreSQL database",
-      "clean": "Removes build artifacts and node_modules",
-      "reset": "Full clean slate: removes everything, reinstalls",
-      "help": "Shows all available commands with descriptions"
-    },
-    "keywords": [
-      "todo",
-      "task-management",
-      "collaboration",
-      "real-time",
-      "socket.io",
-      "react",
-      "express",
-      "postgresql"
-    ],
-    "author": "",
-    "license": "MIT",
-    "engines": {
-      "node": ">=20.0.0",
-      "npm": ">=10.0.0"
-    }
+    "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   }
 }
