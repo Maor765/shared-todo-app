@@ -41,7 +41,7 @@ export default function RegisterPage() {
   const inputStyle = { width: '100%', height: 40, borderRadius: 10, background: 'var(--bg-card)', border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 13, marginBottom: 10, outline: 'none', color: 'var(--text)' } as const;
 
   return (
-    <div style={{ width: 390, minHeight: 780, background: 'var(--bg)', borderRadius: 32, border: '0.5px solid var(--border-light)', overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 8px 40px var(--shadow)' }}>
+    <div style={{ width: '100%', maxWidth: 480, minHeight: '100dvh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px 24px', textAlign: 'center' }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>{t('create_account')}</h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 32 }}>{t('create_account_sub')}</p>
