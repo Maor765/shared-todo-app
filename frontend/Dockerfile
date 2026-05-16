@@ -3,5 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 4001
-CMD ["npm", "run", "dev", "--", "--host", "--port", "4001"]
+RUN npm run build
+RUN npm install -g serve
+EXPOSE 3000
+CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
