@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await auth.login(email, password);
-      navigate('/');
+      navigate({ to: '/' });
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {

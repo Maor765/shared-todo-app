@@ -1,56 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { notificationsAPI } from '../api/notifications.api';
 import { DBNotification } from '../types';
 import { useSocketEvent } from './useSocket';
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<DBNotification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchNotifications = async () => {
-    try {
-      setIsLoading(true);
-      const response = await notificationsAPI.getNotifications();
-      setNotifications(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch notifications');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: notifications = [], isLoading, error } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationsAPI.getNotifications().then((r) => r.data as DBNotification[]),
+    staleTime: 2 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  useSocketEvent('notification:new', ({ notification }) => {
-    setNotifications((prev) => [notification, ...prev]);
+  useSocketEvent('notification:new', ({ notification }: { notification: DBNotification }) => {
+    queryClient.setQueryData<DBNotification[]>(['notifications'], (prev) => [notification, ...(prev ?? [])]);
   });
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const markRead = async (id: string) => {
-    try {
-      await notificationsAPI.markRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => notificationsAPI.markRead(id),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<DBNotification[]>(['notifications'], (prev) =>
+        (prev ?? []).map((n) => (n.id === id ? { ...n, read: true } : n)),
       );
-    } catch (err) {
-      console.error('Failed to mark notification as read', err);
-    }
-  };
+    },
+  });
 
-  const markAllRead = async () => {
-    try {
-      await notificationsAPI.markAllRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (err) {
-      console.error('Failed to mark all notifications as read', err);
-    }
-  };
+  const markAllReadMutation = useMutation({
+    mutationFn: () => notificationsAPI.markAllRead(),
+    onSuccess: () => {
+      queryClient.setQueryData<DBNotification[]>(['notifications'], (prev) =>
+        (prev ?? []).map((n) => ({ ...n, read: true })),
+      );
+    },
+  });
 
-  return { notifications, unreadCount, isLoading, error, markRead, markAllRead };
+  return {
+    notifications,
+    unreadCount,
+    isLoading,
+    error: error ? String(error) : null,
+    markRead: (id: string) => markReadMutation.mutate(id),
+    markAllRead: () => markAllReadMutation.mutate(),
+  };
 }

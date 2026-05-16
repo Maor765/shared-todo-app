@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 import { WorkspaceInvite } from '../types';
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     try {
       const invite = await auth.register(name, email, password, '');
       if (invite) { setPendingInvite(invite); }
-      else { navigate('/'); }
+      else { navigate({ to: '/' }); }
     } catch (err: any) {
       setError(err.response?.data?.error || t('reg_failed'));
     } finally {
@@ -34,8 +34,8 @@ export default function RegisterPage() {
   const handleAccept = async () => {
     if (!pendingInvite) return;
     setAccepting(true);
-    try { await auth.acceptInvite(pendingInvite.id); navigate('/'); }
-    catch { navigate('/'); }
+    try { await auth.acceptInvite(pendingInvite.id); navigate({ to: '/' }); }
+    catch { navigate({ to: '/' }); }
   };
 
   const inputStyle = { width: '100%', height: 40, borderRadius: 10, background: 'var(--bg-card)', border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 13, marginBottom: 10, outline: 'none', color: 'var(--text)' } as const;
@@ -77,7 +77,7 @@ export default function RegisterPage() {
               style={{ width: '100%', height: 42, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 10, opacity: accepting ? 0.6 : 1 }}>
               {accepting ? t('joining') : `${t('join_workspace')} ${pendingInvite.workspace_name}`}
             </button>
-            <button onClick={() => { auth.finalizeSession(); navigate('/'); }}
+            <button onClick={() => { auth.finalizeSession(); navigate({ to: '/' }); }}
               style={{ width: '100%', height: 42, borderRadius: 10, background: 'var(--bg)', color: 'var(--text-muted)', border: '0.5px solid var(--border)', fontSize: 13, cursor: 'pointer' }}>
               {t('skip_invite')}
             </button>

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 import { NavBar } from '../components/ui/NavBar';
@@ -11,10 +12,17 @@ import SettingsPage from './SettingsPage';
 export default function AppShell() {
   const auth = useAuth();
   const { t } = useSettings();
+  const navigate = useNavigate();
   const [tab, setTab] = useState('dash');
   const [detailListId, setDetailListId] = useState<string | null>(null);
 
-  if (!auth.user || !auth.workspace) {
+  useEffect(() => {
+    if (!auth.isLoading && !auth.user) {
+      navigate({ to: '/login' });
+    }
+  }, [auth.isLoading, auth.user, navigate]);
+
+  if (auth.isLoading || !auth.user || !auth.workspace) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: 'var(--text-muted)', fontSize: 14 }}>
         {t('loading')}
