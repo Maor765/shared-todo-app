@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useLists } from '../hooks/useLists';
 import { useSettings } from '../context/SettingsContext';
+import { useSocketEvent } from '../hooks/useSocket';
 import { TopBar } from './ui/TopBar';
 import { IconBtn } from './ui/IconBtn';
 import { Badge } from './ui/Badge';
@@ -17,40 +19,52 @@ export default function Team() {
   const auth = useAuth();
   const { lists } = useLists();
   const { t } = useSettings();
-  const [members, setMembers] = useState<PublicUser[]>([]);
-  const [invites, setInvites] = useState<PendingInvite[]>([]);
+  const queryClient = useQueryClient();
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('member');
   const [invited, setInvited] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const fetchMembers = async () => {
-    try { const r = await workspaceAPI.getMembers(); setMembers(r.data); } catch {}
-  };
-  const fetchInvites = async () => {
-    try { const r = await membersAPI.getInvites(); setInvites(r.data); } catch {}
-  };
+  const { data: members = [] } = useQuery<PublicUser[]>({
+    queryKey: ['members'],
+    queryFn: () => workspaceAPI.getMembers().then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { fetchMembers(); fetchInvites(); }, []);
+  const { data: invites = [] } = useQuery<PendingInvite[]>({
+    queryKey: ['invites'],
+    queryFn: () => membersAPI.getInvites().then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const handleInvite = async () => {
-    if (!inviteEmail) return;
-    setLoading(true);
-    try {
-      await workspaceAPI.inviteMember(inviteEmail, inviteRole);
-      setInvited(true); setInviteEmail('');
-      await Promise.all([fetchMembers(), fetchInvites()]);
+  useSocketEvent('member:status', ({ user_id, status }: { user_id: string; status: string }) => {
+    queryClient.setQueryData<PublicUser[]>(['members'], (prev) =>
+      (prev ?? []).map((m) => (m.id === user_id ? { ...m, status: status as PublicUser['status'] } : m)),
+    );
+  });
+
+  const inviteMutation = useMutation({
+    mutationFn: () => workspaceAPI.inviteMember(inviteEmail, inviteRole),
+    onSuccess: () => {
+      setInvited(true);
+      setInviteEmail('');
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+      queryClient.invalidateQueries({ queryKey: ['invites'] });
       setTimeout(() => { setShowInvite(false); setInvited(false); }, 1500);
-    } catch {} finally { setLoading(false); }
-  };
+    },
+  });
 
-  const handleDeleteInvite = async (inviteId: string) => {
-    try {
-      await membersAPI.deleteInvite(inviteId);
-      setInvites((prev) => prev.filter((i) => i.id !== inviteId));
-    } catch {}
-  };
+  const deleteInviteMutation = useMutation({
+    mutationFn: (inviteId: string) => membersAPI.deleteInvite(inviteId),
+    onSuccess: (_, inviteId) => {
+      queryClient.setQueryData<PendingInvite[]>(['invites'], (prev) =>
+        (prev ?? []).filter((i) => i.id !== inviteId),
+      );
+    },
+  });
+
+  const handleInvite = () => { if (inviteEmail) inviteMutation.mutate(); };
+  const handleDeleteInvite = (inviteId: string) => deleteInviteMutation.mutate(inviteId);
 
   const current = members.find((m) => m.id === auth.user?.id);
 
@@ -169,9 +183,9 @@ export default function Team() {
           </div>
         </div>
 
-        <button onClick={handleInvite} disabled={loading || !inviteEmail}
-          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: loading || !inviteEmail ? 0.6 : 1 }}>
-          {loading ? t('sending') : t('send_invite')}
+        <button onClick={handleInvite} disabled={inviteMutation.isPending || !inviteEmail}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: inviteMutation.isPending || !inviteEmail ? 0.6 : 1 }}>
+          {inviteMutation.isPending ? t('sending') : t('send_invite')}
         </button>
       </Sheet>
     </div>
