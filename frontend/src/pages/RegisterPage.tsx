@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
@@ -16,6 +16,10 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { t } = useSettings();
 
+  useEffect(() => {
+    if (auth.user && !pendingInvite) navigate({ to: '/' });
+  }, [auth.user]);
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -23,7 +27,6 @@ export default function RegisterPage() {
     try {
       const invite = await auth.register(name, email, password, '');
       if (invite) { setPendingInvite(invite); }
-      else { navigate({ to: '/' }); }
     } catch (err: any) {
       setError(err.response?.data?.error || t('reg_failed'));
     } finally {

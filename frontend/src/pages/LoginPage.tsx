@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
@@ -12,13 +12,16 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { t } = useSettings();
 
+  useEffect(() => {
+    if (auth.user) navigate({ to: '/' });
+  }, [auth.user]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
       await auth.login(email, password);
-      navigate({ to: '/' });
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
