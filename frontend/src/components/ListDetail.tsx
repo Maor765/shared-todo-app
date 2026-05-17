@@ -1,17 +1,21 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
 import { useSettings } from '../context/SettingsContext';
-import { DBTask } from '../types';
+import { DBTask, ListWithMembers } from '../types';
 import { TopBar } from './ui/TopBar';
 import { FilterChips } from './ui/FilterChips';
 import { Avatar } from './ui/Avatar';
 import { Badge } from './ui/Badge';
 import { CheckCircle } from './ui/CheckCircle';
 import { Sheet } from './ui/Sheet';
+import { listsAPI } from '../api/lists.api';
 import { tasksAPI } from '../api/tasks.api';
 import { sublistsAPI } from '../api/sublists.api';
 import TaskDetailSheet from './TaskDetailSheet';
+
+const EMOJIS = ['📋','🎨','⚙️','🔬','🚀','💡','📊','🎯','🔧','📝','🌟','💼','🎪','🔥','📱'];
 
 interface ListDetailProps { listId: string; onBack: () => void; }
 
@@ -19,6 +23,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const auth = useAuth();
   const { list } = useListDetail(listId);
   const { t } = useSettings();
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState('All');
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [addSheet, setAddSheet] = useState(false);
@@ -28,6 +33,46 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [addSublist, setAddSublist] = useState<string | null>(null);
   const [addAssignee, setAddAssignee] = useState<string | null>(null);
   const [addDue, setAddDue] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEmoji, setEditEmoji] = useState('📋');
+  const [editShared, setEditShared] = useState(true);
+  const [showDelete, setShowDelete] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const openEdit = () => {
+    if (!list) return;
+    setEditName(list.name);
+    setEditEmoji(list.emoji);
+    setEditShared(list.shared);
+    setShowMenu(false);
+    setShowEdit(true);
+  };
+
+  const saveEdit = async () => {
+    if (!list || !editName.trim()) return;
+    setSaving(true);
+    try {
+      await listsAPI.updateList(listId, { name: editName.trim(), emoji: editEmoji, shared: editShared });
+      queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+        (prev ?? []).map((l) => l.id === listId ? { ...l, name: editName.trim(), emoji: editEmoji, shared: editShared } : l),
+      );
+      queryClient.setQueryData(['list', listId], (prev: any) =>
+        prev ? { ...prev, name: editName.trim(), emoji: editEmoji, shared: editShared } : prev,
+      );
+      setShowEdit(false);
+    } catch {} finally { setSaving(false); }
+  };
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      await listsAPI.deleteList(listId);
+      onBack();
+    } catch {} finally { setDeleting(false); }
+  };
 
   if (!list) return <div style={{ padding: 20, color: 'var(--text-muted)' }}>{t('loading')}</div>;
 
@@ -92,7 +137,28 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           </svg>
           {t('back_lists')}
         </button>
-        <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>{list.emoji} {list.name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>{list.emoji} {list.name}</div>
+          <button onClick={() => setShowMenu((s) => !s)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: 6, color: 'var(--text-muted)', fontSize: 18, lineHeight: 1 }}>
+            ···
+          </button>
+          {showMenu && (
+            <div style={{ position: 'absolute', top: 28, right: 0, zIndex: 20, background: 'var(--bg-card)', borderRadius: 10, border: '0.5px solid var(--border)', boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
+              <button onClick={openEdit}
+                style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                {t('edit_list')}
+              </button>
+              <div style={{ height: '0.5px', background: 'var(--border)' }} />
+              <button onClick={() => { setShowMenu(false); setShowDelete(true); }}
+                style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--danger)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                {t('delete_list')}
+              </button>
+            </div>
+          )}
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
           {(list.members || []).slice(0, 4).map((m, i) => (
             <div key={m.id} style={{ marginLeft: i > 0 ? -6 : 0, border: '2px solid var(--bg-card)', borderRadius: '50%' }}>
@@ -205,6 +271,50 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
       {taskSheet && (
         <TaskDetailSheet task={taskSheet} listId={listId} onClose={() => setTaskSheet(null)} onSave={() => setTaskSheet(null)} onDelete={() => setTaskSheet(null)} />
       )}
+
+      {showMenu && <div onClick={() => setShowMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 15 }} />}
+
+      <Sheet open={showEdit} onClose={() => setShowEdit(false)} title={t('edit_list')}>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{t('name_label')}</div>
+          <input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder={t('list_ph')}
+            style={{ width: '100%', height: 38, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--primary)', padding: '0 12px', fontSize: 14, color: 'var(--text)', outline: 'none' }} />
+        </div>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>{t('emoji_label')}</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {EMOJIS.map((e) => (
+              <button key={e} onClick={() => setEditEmoji(e)}
+                style={{ width: 36, height: 36, borderRadius: 8, fontSize: 18, cursor: 'pointer', background: editEmoji === e ? 'var(--primary-bg)' : 'var(--bg-input)', border: editEmoji === e ? '2px solid var(--primary)' : '0.5px solid var(--border)' }}>
+                {e}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '0.5px solid var(--border)', marginBottom: 16 }}>
+          <span style={{ fontSize: 14, color: 'var(--text)' }}>{t('shared_with_team')}</span>
+          <div onClick={() => setEditShared((s) => !s)}
+            style={{ width: 40, height: 22, borderRadius: 11, background: editShared ? 'var(--primary)' : 'var(--border)', position: 'relative', cursor: 'pointer', transition: 'background .2s' }}>
+            <div style={{ position: 'absolute', width: 18, height: 18, borderRadius: '50%', background: '#fff', top: 2, left: editShared ? 20 : 2, transition: 'left .2s' }} />
+          </div>
+        </div>
+        <button onClick={saveEdit} disabled={saving || !editName.trim()}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: saving || !editName.trim() ? 0.6 : 1 }}>
+          {saving ? t('saving') : t('save')}
+        </button>
+      </Sheet>
+
+      <Sheet open={showDelete} onClose={() => setShowDelete(false)} title={t('delete_list_confirm')}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>{t('delete_list_sub')}</p>
+        <button onClick={confirmDelete} disabled={deleting}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--danger)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 10, opacity: deleting ? 0.6 : 1 }}>
+          {deleting ? '...' : t('delete_list')}
+        </button>
+        <button onClick={() => setShowDelete(false)}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--bg)', color: 'var(--text-muted)', border: '0.5px solid var(--border)', fontSize: 14, cursor: 'pointer' }}>
+          {t('cancel')}
+        </button>
+      </Sheet>
     </div>
   );
 }
