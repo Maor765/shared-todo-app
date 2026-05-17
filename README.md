@@ -15,7 +15,7 @@ A full-stack collaborative task management app built with Node.js, Express, Post
 ## Tech Stack
 
 **Backend:** Node.js + Express + TypeScript + PostgreSQL + Socket.io
-**Frontend:** React 18 + TypeScript + Vite + React Router + Axios
+**Frontend:** React 18 + TypeScript + Vite + TanStack Router + TanStack Query + Axios
 **Deploy:** Railway + Docker
 
 ## Getting Started
