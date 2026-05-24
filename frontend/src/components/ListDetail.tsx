@@ -228,7 +228,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
 
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{addType === 'task' ? t('task_name') : t('sublist_name')}</div>
-          <input value={addName} onChange={(e) => setAddName(e.target.value)} placeholder={addType === 'task' ? t('task_ph') : t('sublist_ph')}
+          <input value={addName} onChange={(e) => setAddName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && doAdd()} placeholder={addType === 'task' ? t('task_ph') : t('sublist_ph')}
             style={{ width: '100%', height: 38, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--primary)', padding: '0 12px', fontSize: 14, color: 'var(--text)', outline: 'none' }} />
         </div>
 
