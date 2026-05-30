@@ -67,7 +67,17 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
         </div>
         <div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{t('due_date')}</div>
-          <input type="date" value={due} onChange={(e) => setDue(e.target.value)} style={inputStyle} />
+          <div style={{ display: 'flex', gap: 4 }}>
+            <input type="date" value={due} onChange={(e) => setDue(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
+            {due && (
+              <button onClick={() => setDue('')}
+                style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
