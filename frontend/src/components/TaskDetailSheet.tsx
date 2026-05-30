@@ -17,7 +17,7 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
   const [text, setText] = useState(task.text);
   const [notes, setNotes] = useState(task.notes || '');
   const [assigneeId, setAssigneeId] = useState(task.assignee_id);
-  const [due, setDue] = useState(task.due || '');
+  const [due, setDue] = useState(task.due ? task.due.slice(0, 10) : '');
   const [sublistId, setSublistId] = useState(task.sublist_id);
   const [saving, setSaving] = useState(false);
 

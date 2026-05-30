@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useLists } from '../hooks/useLists';
 import { useSettings } from '../context/SettingsContext';
-import { DBTask } from '../types';
+import { DBTask, ListWithMembers } from '../types';
 import { TopBar } from './ui/TopBar';
 import { FilterChips } from './ui/FilterChips';
 import { Avatar } from './ui/Avatar';
@@ -13,6 +14,7 @@ import TaskDetailSheet from './TaskDetailSheet';
 
 export default function Dashboard() {
   const auth = useAuth();
+  const queryClient = useQueryClient();
   const { lists } = useLists();
   const { t } = useSettings();
   const [filter, setFilter] = useState('All');
@@ -22,9 +24,10 @@ export default function Dashboard() {
   const today = new Date().toISOString().slice(0, 10);
 
   const filtered = allTasks.filter((task) => {
+    if (task.done) return false;
     if (filter === 'Mine') return task.assignee_id === auth.user?.id;
     if (filter === 'Due today') return task.due === today;
-    if (filter === 'Overdue') return task.due && task.due < today && !task.done;
+    if (filter === 'Overdue') return task.due && task.due < today;
     return true;
   });
 
@@ -38,7 +41,18 @@ export default function Dashboard() {
   const toggleTask = async (taskId: string, listId: string) => {
     const task = allTasks.find((t) => t.id === taskId);
     if (!task) return;
-    try { await tasksAPI.updateTask(listId, taskId, { done: !task.done }); } catch {}
+    const newDone = !task.done;
+    const patch = (done: boolean) =>
+      queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+        (prev ?? []).map((l) =>
+          l.id === listId
+            ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === taskId ? { ...t, done } : t)) }
+            : l,
+        ),
+      );
+    patch(newDone);
+    try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
+    catch { patch(task.done); }
   };
 
   return (
