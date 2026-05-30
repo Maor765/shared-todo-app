@@ -119,7 +119,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
             {assignee && <Avatar member={assignee} size={16} />}
             {assignee && <span>{assignee.name.split(' ')[0]}</span>}
-            {task.due && <span>· {task.due.slice(0, 10)}</span>}
           </div>
         </div>
         {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
