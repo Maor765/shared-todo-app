@@ -53,11 +53,12 @@ export default function AppShell() {
       style={{
         width: '100%',
         maxWidth: 480,
-        minHeight: '100dvh',
+        height: '100dvh',
         background: 'var(--bg)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
