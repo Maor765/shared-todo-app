@@ -28,9 +28,7 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
   };
 
   const handleDelete = async () => {
-    if (confirm(t('delete_confirm'))) {
-      try { await tasksAPI.deleteTask(listId, task.id); onDelete(); } catch {}
-    }
+    try { await tasksAPI.deleteTask(listId, task.id); onDelete(); } catch {}
   };
 
   const handleToggleDone = async () => {
