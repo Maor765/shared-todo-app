@@ -1,4 +1,4 @@
-interface BadgeProps { children: React.ReactNode; variant?: 'neutral' | 'info' | 'success' | 'warn' | 'danger'; }
+﻿interface BadgeProps { children: React.ReactNode; variant?: 'neutral' | 'info' | 'success' | 'warn' | 'danger'; }
 
 export function Badge({ children, variant = 'neutral' }: BadgeProps) {
   const styles: Record<string, { bg: string; color: string }> = {
@@ -10,7 +10,7 @@ export function Badge({ children, variant = 'neutral' }: BadgeProps) {
   };
   const s = styles[variant] || styles.neutral;
   return (
-    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: s.bg, color: s.color, whiteSpace: 'nowrap' }}>
+    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: s.bg, color: s.color, whiteSpace: 'nowrap' }}>
       {children}
     </span>
   );

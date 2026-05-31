@@ -1,4 +1,4 @@
-export function FilterChips({ options, labels, value, onChange }: {
+﻿export function FilterChips({ options, labels, value, onChange }: {
   options: string[];
   labels?: string[];
   value: string;
@@ -11,7 +11,7 @@ export function FilterChips({ options, labels, value, onChange }: {
           key={opt}
           onClick={() => onChange(opt)}
           style={{
-            fontSize: 12, padding: '5px 12px', borderRadius: 999, border: '0.5px solid',
+            fontSize: 13, padding: '5px 12px', borderRadius: 999, border: '0.5px solid',
             fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all .15s',
             background: value === opt ? 'var(--primary)' : 'var(--bg)',
             color: value === opt ? '#fff' : 'var(--text-dim)',

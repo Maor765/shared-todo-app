@@ -1,4 +1,4 @@
-import { useSettings } from '../../context/SettingsContext';
+﻿import { useSettings } from '../../context/SettingsContext';
 
 const ITEMS = [
   { id: 'dash',     icon: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z' },
@@ -24,7 +24,7 @@ export function NavBar({ tab, setTab }: { tab: string; setTab: (id: string) => v
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
             background: 'none', border: 'none', cursor: 'pointer',
             color: tab === item.id ? 'var(--primary)' : 'var(--text-faint)',
-            fontSize: 10, fontWeight: 500,
+            fontSize: 11, fontWeight: 500,
           }}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

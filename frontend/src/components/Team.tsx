@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useLists } from '../hooks/useLists';
@@ -84,23 +84,23 @@ export default function Team() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '4px 16px 16px' }}>
         {current && (
           <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: '20px 16px', textAlign: 'center', marginBottom: 14 }}>
-            <div style={{ margin: '0 auto 10px', width: 64, height: 64, borderRadius: '50%', background: current.color, color: current.text_color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700 }}>
+            <div style={{ margin: '0 auto 10px', width: 64, height: 64, borderRadius: '50%', background: current.color, color: current.text_color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 23, fontWeight: 700 }}>
               {current.initials}
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>{current.name}</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3 }}>{current.email}</div>
+            <div style={{ fontSize: 19, fontWeight: 700, color: 'var(--text)' }}>{current.name}</div>
+            <div style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 3 }}>{current.email}</div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
               <Badge variant="info">{current.role === 'admin' ? t('admin_role') : t('member_role')}</Badge>
               <Badge variant="success">{lists.filter((l) => l.members?.some((m) => m.id === current.id)).length} {t('active_lists')}</Badge>
             </div>
             <button onClick={auth.logout}
-              style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: '0.5px solid var(--border)', background: 'var(--bg-card)', color: 'var(--danger)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ marginTop: 14, padding: '8px 20px', borderRadius: 10, border: '0.5px solid var(--border)', background: 'var(--bg-card)', color: 'var(--danger)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
               {t('log_out')}
             </button>
           </div>
         )}
 
-        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
           {t('all_members')} ({members.length})
         </div>
 
@@ -109,9 +109,9 @@ export default function Team() {
             <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < members.length - 1 ? '0.5px solid var(--border-subtle)' : 'none' }}>
               <Avatar member={m} size={36} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{m.name}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 2, textTransform: 'capitalize' }}>
-                  {m.role === 'admin' ? t('admin_role') : t('member_role')} · {lists.filter((l) => l.members?.some((ml) => ml.id === m.id)).length} {t('nav_lists').toLowerCase()}
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{m.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 2, textTransform: 'capitalize' }}>
+                  {m.role === 'admin' ? t('admin_role') : t('member_role')} ֲ· {lists.filter((l) => l.members?.some((ml) => ml.id === m.id)).length} {t('nav_lists').toLowerCase()}
                 </div>
               </div>
               <Badge variant={m.status === 'active' ? 'info' : 'neutral'}>{m.status === 'active' ? t('active') : t('away')}</Badge>
@@ -121,7 +121,7 @@ export default function Team() {
 
         {invites.length > 0 && (
           <>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, margin: '18px 0 8px' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, margin: '18px 0 8px' }}>
               {t('pending_invites')} ({invites.length})
             </div>
             <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: '0 14px' }}>
@@ -133,10 +133,10 @@ export default function Team() {
                     </svg>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{invite.email}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{invite.email}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
                       <Badge variant="warn">{t('pending_badge')}</Badge>
-                      <span style={{ fontSize: 11, color: 'var(--text-faint)', textTransform: 'capitalize' }}>{invite.role === 'admin' ? t('admin_role') : t('member_role')}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-faint)', textTransform: 'capitalize' }}>{invite.role === 'admin' ? t('admin_role') : t('member_role')}</span>
                     </div>
                   </div>
                   <button onClick={() => handleDeleteInvite(invite.id)} title={t('cancel_invite')}
@@ -153,7 +153,7 @@ export default function Team() {
         )}
 
         {invited && (
-          <div style={{ marginTop: 12, padding: '10px 14px', background: 'var(--success-bg)', borderRadius: 10, fontSize: 13, color: 'var(--success-dim)', fontWeight: 500 }}>
+          <div style={{ marginTop: 12, padding: '10px 14px', background: 'var(--success-bg)', borderRadius: 10, fontSize: 14, color: 'var(--success-dim)', fontWeight: 500 }}>
             {t('invite_sent')}
           </div>
         )}
@@ -161,21 +161,21 @@ export default function Team() {
 
       <Sheet open={showInvite} onClose={() => { setShowInvite(false); setInvited(false); }} title={t('invite_to_ws')}>
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{t('email_address')}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>{t('email_address')}</div>
           <input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="colleague@company.com"
-            style={{ width: '100%', height: 38, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--primary)', padding: '0 12px', fontSize: 14, outline: 'none', color: 'var(--text)' }} />
+            style={{ width: '100%', height: 38, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--primary)', padding: '0 12px', fontSize: 15, outline: 'none', color: 'var(--text)' }} />
         </div>
 
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>{t('role_label')}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>{t('role_label')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {(['member', 'admin'] as const).map((r) => (
               <button key={r} onClick={() => setInviteRole(r)}
                 style={{ padding: 12, borderRadius: 12, border: inviteRole === r ? '2px solid var(--primary)' : '0.5px solid var(--border)', background: inviteRole === r ? 'var(--primary-bg)' : 'var(--bg-input)', cursor: 'pointer', textAlign: 'left' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: inviteRole === r ? 'var(--primary)' : 'var(--text)', textTransform: 'capitalize' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: inviteRole === r ? 'var(--primary)' : 'var(--text)', textTransform: 'capitalize' }}>
                   {r === 'member' ? t('member_role') : t('admin_role')}
                 </div>
-                <div style={{ fontSize: 11, color: inviteRole === r ? 'var(--primary-dim)' : 'var(--text-muted)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: inviteRole === r ? 'var(--primary-dim)' : 'var(--text-muted)', marginTop: 2 }}>
                   {r === 'member' ? t('member_desc') : t('admin_desc')}
                 </div>
               </button>
@@ -184,7 +184,7 @@ export default function Team() {
         </div>
 
         <button onClick={handleInvite} disabled={inviteMutation.isPending || !inviteEmail}
-          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: inviteMutation.isPending || !inviteEmail ? 0.6 : 1 }}>
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: inviteMutation.isPending || !inviteEmail ? 0.6 : 1 }}>
           {inviteMutation.isPending ? t('sending') : t('send_invite')}
         </button>
       </Sheet>

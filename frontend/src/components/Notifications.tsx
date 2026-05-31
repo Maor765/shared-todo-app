@@ -1,4 +1,4 @@
-import { useNotifications } from "../hooks/useNotifications";
+﻿import { useNotifications } from "../hooks/useNotifications";
 import { useSettings } from "../context/SettingsContext";
 import { TopBar } from "./ui/TopBar";
 import { IconBtn } from "./ui/IconBtn";
@@ -54,16 +54,16 @@ export default function Notifications() {
       <div style={{ flex: 1 }}>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             color: n.read ? "var(--text-muted)" : "var(--text)",
             lineHeight: 1.4,
           }}
         >
           {n.text}
         </div>
-        <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 2 }}>
+        <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>
           {n.context}
-          {clickable ? ` · ${getTime(n.created_at)}` : ""}
+          {clickable ? ` ֲ· ${getTime(n.created_at)}` : ""}
         </div>
       </div>
     </div>
@@ -93,7 +93,7 @@ export default function Notifications() {
           <>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 600,
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
@@ -112,7 +112,7 @@ export default function Notifications() {
           <>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: 600,
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
@@ -135,10 +135,10 @@ export default function Notifications() {
               color: "var(--text-faint)",
             }}
           >
-            <div style={{ fontSize: 32, marginBottom: 8 }}>🔔</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>נ””</div>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 color: "var(--text-dim)",
               }}
