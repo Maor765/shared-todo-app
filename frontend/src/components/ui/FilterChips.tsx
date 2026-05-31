@@ -11,7 +11,7 @@
           key={opt}
           onClick={() => onChange(opt)}
           style={{
-            fontSize: 13, padding: '5px 12px', borderRadius: 999, border: '0.5px solid',
+            fontSize: 14, padding: '5px 12px', borderRadius: 999, border: '0.5px solid',
             fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all .15s',
             background: value === opt ? 'var(--primary)' : 'var(--bg)',
             color: value === opt ? '#fff' : 'var(--text-dim)',

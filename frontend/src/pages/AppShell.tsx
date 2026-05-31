@@ -24,7 +24,7 @@ export default function AppShell() {
 
   if (auth.isLoading || !auth.user || !auth.workspace) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: 'var(--text-muted)', fontSize: 15 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: 'var(--text-muted)', fontSize: 16 }}>
         {t('loading')}
       </div>
     );

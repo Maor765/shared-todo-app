@@ -64,7 +64,7 @@ export default function Dashboard() {
           auth.user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
               <Avatar member={auth.user} size={24} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
             </div>
           ) : null
         }
@@ -86,21 +86,21 @@ export default function Dashboard() {
             { num: lists.length, lbl: t('nav_lists'), color: 'var(--text)' },
           ].map((s) => (
             <div key={s.lbl} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '10px 12px', border: '0.5px solid var(--border)' }}>
-              <div style={{ fontSize: 23, fontWeight: 700, color: s.color }}>{s.num}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
           {filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
         </div>
 
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-faint)' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>ג“</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
-            <div style={{ fontSize: 13, marginTop: 4 }}>{t('no_tasks_filter')}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
+            <div style={{ fontSize: 14, marginTop: 4 }}>{t('no_tasks_filter')}</div>
           </div>
         ) : (
           filtered.map((task) => {
@@ -118,8 +118,8 @@ export default function Dashboard() {
                   <CheckCircle done={task.done} onToggle={() => toggleTask(task.id, task.list_id)} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.text}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
+                  <div style={{ fontSize: 15, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.text}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
                 </div>
                 {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
                 {isDueSoon && <Badge variant="warn">{t('due_soon_badge')}</Badge>}

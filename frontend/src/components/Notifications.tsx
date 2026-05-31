@@ -54,14 +54,14 @@ export default function Notifications() {
       <div style={{ flex: 1 }}>
         <div
           style={{
-            fontSize: 14,
+            fontSize: 15,
             color: n.read ? "var(--text-muted)" : "var(--text)",
             lineHeight: 1.4,
           }}
         >
           {n.text}
         </div>
-        <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>
+        <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 2 }}>
           {n.context}
           {clickable ? ` ֲ· ${getTime(n.created_at)}` : ""}
         </div>
@@ -93,7 +93,7 @@ export default function Notifications() {
           <>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
@@ -112,7 +112,7 @@ export default function Notifications() {
           <>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
@@ -138,7 +138,7 @@ export default function Notifications() {
             <div style={{ fontSize: 32, marginBottom: 8 }}>נ””</div>
             <div
               style={{
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: 600,
                 color: "var(--text-dim)",
               }}

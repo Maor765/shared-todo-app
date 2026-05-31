@@ -10,7 +10,7 @@
         style={{ background: 'var(--bg-card)', borderRadius: '16px 16px 0 0', padding: '16px 16px 32px', width: '100%', maxHeight: '85%', overflowY: 'auto' }}
       >
         <div style={{ width: 36, height: 4, background: 'var(--border-light)', borderRadius: 2, margin: '0 auto 14px' }} />
-        {title && <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text)', marginBottom: 16 }}>{title}</div>}
+        {title && <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text)', marginBottom: 16 }}>{title}</div>}
         {children}
       </div>
     </div>
