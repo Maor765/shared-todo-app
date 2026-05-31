@@ -55,7 +55,8 @@ export async function register(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { email, password, name, workspace_name } = req.body;
+    const { email: rawEmail, password, name, workspace_name } = req.body;
+    const email = rawEmail?.toLowerCase();
 
     if (!email || !password || !name) {
       throw new AppError(400, 'Missing required fields');
@@ -116,7 +117,7 @@ export async function register(
       `SELECT wi.id, wi.role, w.id as workspace_id, w.name as workspace_name
        FROM workspace_invites wi
        JOIN workspaces w ON w.id = wi.workspace_id
-       WHERE wi.email = $1
+       WHERE LOWER(wi.email) = $1
        LIMIT 1`,
       [email],
     );
@@ -140,7 +141,8 @@ export async function login(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { email, password } = req.body;
+    const { email: rawEmail, password } = req.body;
+    const email = rawEmail?.toLowerCase();
 
     if (!email || !password) {
       throw new AppError(400, 'Email and password required');
@@ -218,7 +220,7 @@ export async function acceptInvite(
       `SELECT id, email, name, initials, color, text_color, role, status FROM users WHERE id = $1`,
       [userId],
     );
-    if (userResult.rows[0].email !== invite.email) throw new AppError(403, 'Invite not for this account');
+    if (userResult.rows[0].email.toLowerCase() !== invite.email.toLowerCase()) throw new AppError(403, 'Invite not for this account');
 
     await query(
       `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,

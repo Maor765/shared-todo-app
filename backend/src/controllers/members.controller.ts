@@ -99,10 +99,11 @@ export async function inviteMember(
       throw new AppError(403, 'Forbidden: admin only');
     }
 
-    const { email, role: newRole } = req.body;
-    if (!email) {
+    const { email: rawEmail, role: newRole } = req.body;
+    if (!rawEmail) {
       throw new AppError(400, 'Email required');
     }
+    const email = rawEmail.toLowerCase();
 
     const existingUser = await query(
       `SELECT id, name FROM users WHERE email = $1`,
