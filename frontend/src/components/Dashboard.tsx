@@ -118,7 +118,7 @@ export default function Dashboard() {
                   <CheckCircle done={task.done} onToggle={() => toggleTask(task.id, task.list_id)} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: task.done ? 'var(--text-disabled)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.text}</div>
+                  <div style={{ fontSize: 13, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.text}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
                 </div>
                 {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}

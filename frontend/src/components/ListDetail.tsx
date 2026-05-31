@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
 import { useSettings } from '../context/SettingsContext';
-import { DBTask, ListWithMembers } from '../types';
+import { DBTask, ListDetail, ListWithMembers } from '../types';
 import { TopBar } from './ui/TopBar';
 import { FilterChips } from './ui/FilterChips';
 import { Avatar } from './ui/Avatar';
@@ -88,7 +88,14 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const toggleTask = async (taskId: string) => {
     const task = list.tasks.find((task) => task.id === taskId);
     if (!task) return;
-    try { await tasksAPI.updateTask(listId, taskId, { done: !task.done }); } catch {}
+    const newDone = !task.done;
+    const patch = (done: boolean) =>
+      queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
+        prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, done } : t)) } : prev,
+      );
+    patch(newDone);
+    try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
+    catch { patch(task.done); }
   };
 
   const doAdd = async () => {
@@ -115,7 +122,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, color: task.done ? 'var(--text-disabled)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</div>
+          <div style={{ fontSize: 13, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</div>
           <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
             {assignee && <Avatar member={assignee} size={16} />}
             {assignee && <span>{assignee.name.split(' ')[0]}</span>}
