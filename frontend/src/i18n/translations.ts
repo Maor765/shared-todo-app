@@ -36,7 +36,7 @@ const en: T = {
   emoji_label: 'Emoji', shared_with_team: 'Shared with team', create_list: 'Create list',
   done_badge: 'Done', tasks_badge: 'tasks', empty_badge: 'Empty',
   list_ph: 'e.g. Q3 Roadmap',
-  edit_list: 'Edit list', delete_list: 'Delete list', mark_all_done: 'Mark all done',
+  edit_list: 'Edit list', delete_list: 'Delete list', mark_all_done: 'Mark all done', unmark_all_done: 'Unmark all',
   delete_list_confirm: 'Delete this list?', delete_list_sub: 'This will permanently delete all tasks in this list.',
   // ListDetail
   back_lists: 'Lists', no_tasks_yet: 'No tasks yet',
@@ -95,7 +95,7 @@ const he: T = {
   emoji_label: "אמוג'י", shared_with_team: 'משותפת עם הצוות', create_list: 'צור רשימה',
   done_badge: 'הושלם', tasks_badge: 'משימות', empty_badge: 'ריק',
   list_ph: 'לדוגמה: מפת דרכים',
-  edit_list: 'ערוך רשימה', delete_list: 'מחק רשימה', mark_all_done: 'סמן הכל כבוצע',
+  edit_list: 'ערוך רשימה', delete_list: 'מחק רשימה', mark_all_done: 'סמן הכל כבוצע', unmark_all_done: 'בטל סימון הכל',
   delete_list_confirm: 'למחוק את הרשימה?', delete_list_sub: 'פעולה זו תמחק לצמיתות את כל המשימות ברשימה.',
   back_lists: 'רשימות', no_tasks_yet: 'אין משימות עדיין',
   add_task_sublist: '...הוסף תת-רשימה או משימה', add_to: 'הוסף ל',

@@ -118,6 +118,20 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     await Promise.allSettled(undone.map((t) => tasksAPI.updateTask(listId, t.id, { done: true })));
   };
 
+  const unmarkAllDone = async () => {
+    const done = list.tasks.filter((t) => t.done);
+    if (!done.length) return;
+    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
+      prev ? { ...prev, tasks: prev.tasks.map((t) => ({ ...t, done: false })) } : prev,
+    );
+    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+      (prev ?? []).map((l) =>
+        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => ({ ...t, done: false })) } : l,
+      ),
+    );
+    await Promise.allSettled(done.map((t) => tasksAPI.updateTask(listId, t.id, { done: false })));
+  };
+
   const doAdd = async () => {
     if (!addName.trim()) return;
     try {
@@ -203,12 +217,23 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
       />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 16px' }}>
-        {list.tasks.some((t) => !t.done) && (
-          <button onClick={markAllDone}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, padding: '7px 14px', borderRadius: 10, background: 'var(--success-bg)', border: '0.5px solid var(--success)', color: 'var(--success-dim)', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            {t('mark_all_done')}
-          </button>
+        {(list.tasks.some((t) => !t.done) || list.tasks.some((t) => t.done)) && (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+            {list.tasks.some((t) => !t.done) && (
+              <button onClick={markAllDone}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: 'var(--success-bg)', border: '0.5px solid var(--success)', color: 'var(--success-dim)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {t('mark_all_done')}
+              </button>
+            )}
+            {list.tasks.some((t) => t.done) && (
+              <button onClick={unmarkAllDone}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--border-mid)', color: 'var(--text-muted)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
+                {t('unmark_all_done')}
+              </button>
+            )}
+          </div>
         )}
         {(list.sublists || []).map((sl) => {
           const tasks = list.tasks.filter((task) => task.sublist_id === sl.id && filterTask(task));
