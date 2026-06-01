@@ -41,7 +41,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [editName, setEditName] = useState('');
-  const [editEmoji, setEditEmoji] = useState('נ“‹');
+  const [editEmoji, setEditEmoji] = useState('📋');
   const [editShared, setEditShared] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -277,7 +277,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           {['task', 'sublist'].map((type) => (
             <button key={type} onClick={() => setAddType(type)}
               style={{ padding: 14, borderRadius: 12, border: addType === type ? '2px solid var(--primary)' : '0.5px solid var(--border)', background: addType === type ? 'var(--primary-bg)' : 'var(--bg-input)', cursor: 'pointer', textAlign: 'center' }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>{type === 'task' ? 'ג…' : 'נ“‚'}</div>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>{type === 'task' ? '✅' : 'נ“‚'}</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: addType === type ? 'var(--primary)' : 'var(--text)' }}>{type === 'task' ? t('type_task') : t('type_sublist')}</div>
               <div style={{ fontSize: 13, color: addType === type ? 'var(--primary-dim)' : 'var(--text-muted)', marginTop: 2 }}>{type === 'task' ? t('single_todo') : t('group_tasks')}</div>
             </button>

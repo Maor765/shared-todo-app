@@ -29,14 +29,14 @@ export default function Lists({ onSelectList }: ListsProps) {
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newEmoji, setNewEmoji] = useState("נ“‹");
+  const [newEmoji, setNewEmoji] = useState("📋");
   const [newShared, setNewShared] = useState(true);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [menuListId, setMenuListId] = useState<string | null>(null);
   const [editList, setEditList] = useState<ListWithMembers | null>(null);
   const [editName, setEditName] = useState("");
-  const [editEmoji, setEditEmoji] = useState("נ“‹");
+  const [editEmoji, setEditEmoji] = useState("📋");
   const [editShared, setEditShared] = useState(true);
   const [deleteList, setDeleteList] = useState<ListWithMembers | null>(null);
   const [saving, setSaving] = useState(false);
@@ -81,7 +81,7 @@ export default function Lists({ onSelectList }: ListsProps) {
     try {
       await listsAPI.createList(newName.trim(), newEmoji, newShared);
       setNewName("");
-      setNewEmoji("נ“‹");
+      setNewEmoji("📋");
       setNewShared(true);
       setShowCreate(false);
     } catch {}
@@ -472,7 +472,7 @@ export default function Lists({ onSelectList }: ListsProps) {
 
         {!search && lists.length === 0 && (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <div style={{ fontSize: 42, marginBottom: 12 }}>נ“‹</div>
+            <div style={{ fontSize: 42, marginBottom: 12 }}>📋</div>
             <div
               style={{
                 fontSize: 18,

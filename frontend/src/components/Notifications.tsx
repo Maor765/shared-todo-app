@@ -135,7 +135,7 @@ export default function Notifications() {
               color: "var(--text-faint)",
             }}
           >
-            <div style={{ fontSize: 32, marginBottom: 8 }}>נ””</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🔔</div>
             <div
               style={{
                 fontSize: 16,
