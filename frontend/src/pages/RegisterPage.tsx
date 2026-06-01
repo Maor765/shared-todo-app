@@ -69,7 +69,7 @@ export default function RegisterPage() {
       {pendingInvite && (
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,26,26,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 32, zIndex: 10, padding: 28 }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '32px 24px', width: '100%', textAlign: 'center', boxShadow: '0 4px 24px rgba(0,0,0,0.12)' }}>
-            <div style={{ fontSize: 40, marginBottom: 14 }}>נ‰</div>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>🎉</div>
             <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>{t('youre_invited')}</div>
             <div style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 28 }}>
               {t('invite_message')}<br />
