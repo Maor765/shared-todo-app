@@ -98,7 +98,7 @@ export default function Dashboard() {
 
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-faint)' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>ג“</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>✓</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
             <div style={{ fontSize: 14, marginTop: 4 }}>{t('no_tasks_filter')}</div>
           </div>
