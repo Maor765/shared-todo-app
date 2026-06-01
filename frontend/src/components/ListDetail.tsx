@@ -103,6 +103,21 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     catch { patch(task.done); }
   };
 
+  const markAllDone = async () => {
+    setShowMenu(false);
+    const undone = list.tasks.filter((t) => !t.done);
+    if (!undone.length) return;
+    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
+      prev ? { ...prev, tasks: prev.tasks.map((t) => ({ ...t, done: true })) } : prev,
+    );
+    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+      (prev ?? []).map((l) =>
+        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => ({ ...t, done: true })) } : l,
+      ),
+    );
+    await Promise.allSettled(undone.map((t) => tasksAPI.updateTask(listId, t.id, { done: true })));
+  };
+
   const doAdd = async () => {
     if (!addName.trim()) return;
     try {
@@ -160,6 +175,12 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
                 style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 {t('edit_list')}
+              </button>
+              <div style={{ height: '0.5px', background: 'var(--border)' }} />
+              <button onClick={markAllDone}
+                style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--success)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {t('mark_all_done')}
               </button>
               <div style={{ height: '0.5px', background: 'var(--border)' }} />
               <button onClick={() => { setShowMenu(false); setShowDelete(true); }}
