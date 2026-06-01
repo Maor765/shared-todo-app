@@ -59,7 +59,7 @@ export default function Dashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
       <TopBar
         title={t('nav_dash')}
-        sub={`${greeting}, ${auth.user?.name.split(' ')[0]} נ‘‹`}
+        sub={`${greeting}, ${auth.user?.name.split(' ')[0]} 👋`}
         right={
           auth.user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
