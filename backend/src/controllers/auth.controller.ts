@@ -277,12 +277,14 @@ export async function getMe(
     }
 
     const workspaceResult = await query(
-      `SELECT id, name FROM workspaces WHERE id = $1`,
-      [workspaceId],
+      `SELECT w.id, w.name FROM workspaces w
+       JOIN workspace_members wm ON wm.workspace_id = w.id
+       WHERE w.id = $1 AND wm.user_id = $2`,
+      [workspaceId, userId],
     );
 
     if (workspaceResult.rowCount === 0) {
-      throw new AppError(404, 'Workspace not found');
+      throw new AppError(401, 'Not a member of this workspace');
     }
 
     res.json({
