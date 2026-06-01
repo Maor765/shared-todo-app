@@ -150,7 +150,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               onClick={(e) => { e.stopPropagation(); setMenuListId(isMenuOpen ? null : list.id); }}
               style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 4px", borderRadius: 6, color: "var(--text-muted)", fontSize: 18, lineHeight: 1, display: "flex", alignItems: "center" }}
             >
-              ֲ·ֲ·ֲ·
+              <svg width="18" height="4" viewBox="0 0 18 4" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/></svg>
             </button>
           </div>
         </div>
@@ -259,7 +259,7 @@ export default function Lists({ onSelectList }: ListsProps) {
     >
       <TopBar
         title={t("my_lists")}
-        sub={`${lists.length} ${t("nav_lists")} ֲ· ${shared.length} ${t("shared_section").toLowerCase()}`}
+        sub={`${lists.length} ${t("nav_lists")} · ${shared.length} ${t("shared_section").toLowerCase()}`}
         right={
           <>
             <IconBtn

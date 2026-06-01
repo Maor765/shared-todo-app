@@ -63,7 +63,7 @@ export default function Notifications() {
         </div>
         <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 2 }}>
           {n.context}
-          {clickable ? ` ֲ· ${getTime(n.created_at)}` : ""}
+          {clickable ? ` · ${getTime(n.created_at)}` : ""}
         </div>
       </div>
     </div>

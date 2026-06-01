@@ -111,7 +111,7 @@ export default function Team() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{m.name}</div>
                 <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, textTransform: 'capitalize' }}>
-                  {m.role === 'admin' ? t('admin_role') : t('member_role')} ֲ· {lists.filter((l) => l.members?.some((ml) => ml.id === m.id)).length} {t('nav_lists').toLowerCase()}
+                  {m.role === 'admin' ? t('admin_role') : t('member_role')} · {lists.filter((l) => l.members?.some((ml) => ml.id === m.id)).length} {t('nav_lists').toLowerCase()}
                 </div>
               </div>
               <Badge variant={m.status === 'active' ? 'info' : 'neutral'}>{m.status === 'active' ? t('active') : t('away')}</Badge>

@@ -181,7 +181,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>{list.emoji} {list.name}</div>
           <button onClick={() => setShowMenu((s) => !s)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: 6, color: 'var(--text-muted)', fontSize: 20, lineHeight: 1 }}>
-            ֲ·ֲ·ֲ·
+            <svg width="18" height="4" viewBox="0 0 18 4" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/></svg>
           </button>
           {showMenu && (
             <div style={{ position: 'absolute', top: 28, right: 0, zIndex: 20, background: 'var(--bg-card)', borderRadius: 10, border: '0.5px solid var(--border)', boxShadow: '0 4px 16px rgba(0,0,0,0.12)', overflow: 'hidden', minWidth: 130 }}>
