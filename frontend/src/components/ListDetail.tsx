@@ -177,12 +177,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
                 {t('edit_list')}
               </button>
               <div style={{ height: '0.5px', background: 'var(--border)' }} />
-              <button onClick={markAllDone}
-                style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--success)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {t('mark_all_done')}
-              </button>
-              <div style={{ height: '0.5px', background: 'var(--border)' }} />
               <button onClick={() => { setShowMenu(false); setShowDelete(true); }}
                 style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--danger)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
@@ -209,6 +203,13 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
       />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 16px' }}>
+        {list.tasks.some((t) => !t.done) && (
+          <button onClick={markAllDone}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, padding: '7px 14px', borderRadius: 10, background: 'var(--success-bg)', border: '0.5px solid var(--success)', color: 'var(--success-dim)', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            {t('mark_all_done')}
+          </button>
+        )}
         {(list.sublists || []).map((sl) => {
           const tasks = list.tasks.filter((task) => task.sublist_id === sl.id && filterTask(task));
           return (
