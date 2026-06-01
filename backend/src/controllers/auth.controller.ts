@@ -170,7 +170,7 @@ export async function login(
        FROM workspace_members
        JOIN workspaces ON workspaces.id = workspace_members.workspace_id
        WHERE workspace_members.user_id = $1
-       ORDER BY (workspaces.owner_id = $1) ASC
+       ORDER BY (workspaces.owner_id = $1) DESC
        LIMIT 1`,
       [user.id],
     );
