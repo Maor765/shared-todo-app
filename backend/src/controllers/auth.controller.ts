@@ -230,6 +230,18 @@ export async function acceptInvite(
 
     await query(`DELETE FROM workspace_invites WHERE id = $1`, [inviteId]);
 
+    // If the user's own workspace is empty, remove them from it so login lands here
+    const ownWs = await query(
+      `SELECT w.id FROM workspaces w WHERE w.owner_id = $1
+       AND (SELECT COUNT(*) FROM lists WHERE workspace_id = w.id) = 0`,
+      [userId],
+    );
+    if (ownWs.rowCount > 0) {
+      const ownId = ownWs.rows[0].id;
+      await query(`DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2`, [ownId, userId]);
+      await query(`DELETE FROM workspaces WHERE id = $1`, [ownId]);
+    }
+
     const token = signToken(userId, invite.workspace_id, invite.role);
 
     res.json({

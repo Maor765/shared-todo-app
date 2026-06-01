@@ -22,10 +22,21 @@ export default function AppShell() {
     }
   }, [auth.isLoading, auth.user, navigate]);
 
-  if (auth.isLoading || !auth.user || !auth.workspace) {
+  if (auth.isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'system-ui', color: 'var(--text-muted)', fontSize: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)', fontSize: 16 }}>
         {t('loading')}
+      </div>
+    );
+  }
+
+  if (!auth.user || !auth.workspace) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 16, color: 'var(--text-muted)', fontSize: 16 }}>
+        <div>{t('loading')}</div>
+        <button onClick={auth.logout} style={{ padding: '8px 20px', borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          {t('log_out')}
+        </button>
       </div>
     );
   }
