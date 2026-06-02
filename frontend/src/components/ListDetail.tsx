@@ -178,7 +178,19 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           {t('back_lists')}
         </button>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>{list.emoji} {list.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>{list.emoji} {list.name}</div>
+            {list.tasks.length > 0 && (
+              <span style={{
+                fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
+                background: list.tasks.every(t => t.done) ? 'var(--success-bg)' : 'var(--bg)',
+                color: list.tasks.every(t => t.done) ? 'var(--success-dim)' : 'var(--text-muted)',
+                border: '0.5px solid var(--border)',
+              }}>
+                {list.tasks.every(t => t.done) ? t('done_badge') : `${list.tasks.filter(t => t.done).length}/${list.tasks.length}`}
+              </span>
+            )}
+          </div>
           <button onClick={() => setShowMenu((s) => !s)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: 6, color: 'var(--text-muted)', fontSize: 20, lineHeight: 1 }}>
             <svg width="18" height="4" viewBox="0 0 18 4" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/></svg>

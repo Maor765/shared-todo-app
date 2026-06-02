@@ -155,14 +155,14 @@ export default function Lists({ onSelectList }: ListsProps) {
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {prog === 100 ? (
-              <Badge variant="success">{t("done_badge")}</Badge>
-            ) : taskCount > 0 ? (
-              <Badge variant={prog > 50 ? "warn" : "info"}>
-                {taskCount} {t("tasks_badge")}
-              </Badge>
-            ) : (
+            {taskCount === 0 ? (
               <Badge variant="neutral">{t("empty_badge")}</Badge>
+            ) : doneCount === taskCount ? (
+              <Badge variant="success">{t("done_badge")}</Badge>
+            ) : (
+              <Badge variant={prog > 50 ? "warn" : "info"}>
+                {doneCount}/{taskCount}
+              </Badge>
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setMenuListId(isMenuOpen ? null : list.id); }}
