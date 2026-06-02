@@ -9,6 +9,7 @@ import { FilterChips } from './ui/FilterChips';
 import { Avatar } from './ui/Avatar';
 import { Badge } from './ui/Badge';
 import { CheckCircle } from './ui/CheckCircle';
+import { IconBtn } from './ui/IconBtn';
 import { tasksAPI } from '../api/tasks.api';
 import TaskDetailSheet from './TaskDetailSheet';
 
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const { lists } = useLists();
   const { t } = useSettings();
   const [filter, setFilter] = useState('All');
+  const [search, setSearch] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const [taskSheet, setTaskSheet] = useState<DBTask | null>(null);
 
   const allTasks = lists.flatMap((l) => l.tasks?.map((task) => ({ ...task, list: l })) || []);
@@ -25,6 +28,7 @@ export default function Dashboard() {
 
   const filtered = allTasks.filter((task) => {
     if (task.done) return false;
+    if (search) return task.text.toLowerCase().includes(search.toLowerCase());
     if (filter === 'Mine') return task.assignee_id === auth.user?.id;
     if (filter === 'Due today') return task.due === today;
     if (filter === 'Overdue') return task.due && task.due < today;
@@ -61,15 +65,28 @@ export default function Dashboard() {
         title={t('nav_dash')}
         sub={`${greeting}, ${auth.user?.name.split(' ')[0]} 👋`}
         right={
-          auth.user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
-              <Avatar member={auth.user} size={24} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
-            </div>
-          ) : null
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <IconBtn icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" onClick={() => { setShowSearch((s) => !s); setSearch(''); }} />
+            {auth.user && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
+                <Avatar member={auth.user} size={24} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
+              </div>
+            )}
+          </div>
         }
       />
 
+      {showSearch && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg)', borderRadius: 10, border: '0.5px solid var(--border)', padding: '0 12px', height: 38, margin: '0 16px 8px' }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2" strokeLinecap="round">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+          </svg>
+          <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('search_ph')}
+            style={{ border: 'none', background: 'none', fontSize: 15, color: 'var(--text)', outline: 'none', flex: 1 }} />
+        </div>
+      )}
       <FilterChips
         options={['All', 'Mine', 'Due today', 'Overdue']}
         labels={[t('filter_all'), t('filter_mine'), t('filter_due_today'), t('filter_overdue')]}
