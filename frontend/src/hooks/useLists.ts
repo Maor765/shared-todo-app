@@ -11,6 +11,7 @@ export function useLists() {
     queryKey: ['lists'],
     queryFn: () => listsAPI.getLists().then((r) => r.data as ListWithMembers[]),
     staleTime: 5 * 60 * 1000,
+    gcTime: Infinity, // never evict — useLists unmounts while in ListDetail, cache must survive
   });
 
   // Merge tasks from any cached ListDetail entries — detail cache is authoritative
@@ -66,6 +67,7 @@ export function useListDetail(listId: string) {
     queryKey: ['list', listId],
     queryFn: () => listsAPI.getListDetail(listId).then((r) => r.data as ListDetail),
     staleTime: 2 * 60 * 1000,
+    gcTime: Infinity,
     enabled: !!listId,
   });
 
