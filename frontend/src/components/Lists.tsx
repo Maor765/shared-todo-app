@@ -10,6 +10,7 @@ import { ProgressBar } from "./ui/ProgressBar";
 import { Avatar } from "./ui/Avatar";
 import { Sheet } from "./ui/Sheet";
 import { listsAPI } from "../api/lists.api";
+import { tasksAPI } from "../api/tasks.api";
 import React from "react";
 
 const EMOJIS = [
@@ -85,6 +86,23 @@ export default function Lists({ onSelectList }: ListsProps) {
       setNewShared(true);
       setShowCreate(false);
     } catch {}
+  };
+
+  const toggleTask = async (task: DBTask, listId: string) => {
+    const newDone = !task.done;
+    queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
+      (prev ?? []).map((l) =>
+        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done: newDone } : t)) } : l,
+      ),
+    );
+    try { await tasksAPI.updateTask(listId, task.id, { done: newDone }); }
+    catch {
+      queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
+        (prev ?? []).map((l) =>
+          l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done: task.done } : t)) } : l,
+        ),
+      );
+    }
   };
 
   const taskResults: Array<{ task: DBTask; list: ListWithMembers }> = search
@@ -369,32 +387,23 @@ export default function Lists({ onSelectList }: ListsProps) {
                     }}
                   >
                     <div
+                      onClick={(e) => { e.stopPropagation(); toggleTask(task, list.id); }}
                       style={{
-                        width: 18,
-                        height: 18,
+                        width: 22,
+                        height: 22,
                         borderRadius: "50%",
                         flexShrink: 0,
                         marginTop: 1,
-                        background: task.done
-                          ? "var(--success)"
-                          : "transparent",
-                        border: task.done
-                          ? "none"
-                          : "1.5px solid var(--border-mid)",
+                        background: task.done ? "var(--success)" : "transparent",
+                        border: task.done ? "none" : "1.5px solid var(--border-mid)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        cursor: "pointer",
                       }}
                     >
                       {task.done && (
-                        <svg
-                          width="10"
-                          height="10"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#fff"
-                          strokeWidth="3"
-                        >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
