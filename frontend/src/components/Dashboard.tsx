@@ -27,8 +27,8 @@ export default function Dashboard() {
   const today = new Date().toISOString().slice(0, 10);
 
   const filtered = allTasks.filter((task) => {
-    if (task.done) return false;
     if (search) return task.text.toLowerCase().includes(search.toLowerCase());
+    if (task.done) return false;
     if (filter === 'Mine') return task.assignee_id === auth.user?.id;
     if (filter === 'Due today') return task.due === today;
     if (filter === 'Overdue') return task.due && task.due < today;
