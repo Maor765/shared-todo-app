@@ -76,6 +76,8 @@ const en: T = {
   // Settings
   settings: 'Settings', appearance: 'Appearance', dark_mode: 'Dark mode',
   language: 'Language', hebrew: 'Hebrew (עברית)',
+  export_section: 'Data', export_csv: 'Export to CSV', export_btn: 'Export',
+  export_csv_sub: 'Download all tasks from all lists as a spreadsheet.',
 };
 
 
@@ -142,6 +144,8 @@ const he: T = {
   pending_badge: 'ממתין', cancel_invite: 'בטל הזמנה', log_out: 'התנתק',
   settings: 'הגדרות', appearance: 'מראה', dark_mode: 'מצב כהה',
   language: 'שפה', hebrew: 'עברית',
+  export_section: 'נתונים', export_csv: 'ייצוא ל-CSV', export_btn: 'ייצוא',
+  export_csv_sub: 'הורד את כל המשימות מכל הרשימות כגיליון אלקטרוני.',
 };
 
 export const translations: Record<Lang, T> = { en, he };
