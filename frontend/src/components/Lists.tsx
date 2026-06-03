@@ -2,7 +2,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLists } from "../hooks/useLists";
 import { useSettings } from "../context/SettingsContext";
-import { ListWithMembers, DBTask } from "../types";
+import { ListWithMembers, ListDetail, DBTask } from "../types";
 import { TopBar } from "./ui/TopBar";
 import { IconBtn } from "./ui/IconBtn";
 import { Badge } from "./ui/Badge";
@@ -90,19 +90,19 @@ export default function Lists({ onSelectList }: ListsProps) {
 
   const toggleTask = async (task: DBTask, listId: string) => {
     const newDone = !task.done;
-    queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
-      (prev ?? []).map((l) =>
-        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done: newDone } : t)) } : l,
-      ),
-    );
-    try { await tasksAPI.updateTask(listId, task.id, { done: newDone }); }
-    catch {
+    const patchLists = (done: boolean) => {
       queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
         (prev ?? []).map((l) =>
-          l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done: task.done } : t)) } : l,
+          l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done } : t)) } : l,
         ),
       );
-    }
+      queryClient.setQueryData<ListDetail>(["list", listId], (prev) =>
+        prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === task.id ? { ...t, done } : t)) } : prev,
+      );
+    };
+    patchLists(newDone);
+    try { await tasksAPI.updateTask(listId, task.id, { done: newDone }); }
+    catch { patchLists(task.done); }
   };
 
   const taskResults: Array<{ task: DBTask; list: ListWithMembers }> = search

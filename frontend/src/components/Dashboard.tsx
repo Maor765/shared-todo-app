@@ -95,22 +95,24 @@ export default function Dashboard() {
       />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
-          {[
-            { num: total, lbl: t('total_tasks'),  color: 'var(--text)' },
-            { num: done,  lbl: t('completed'),    color: 'var(--success)' },
-            { num: inProg,lbl: t('open'),         color: 'var(--warning)' },
-            { num: lists.length, lbl: t('nav_lists'), color: 'var(--text)' },
-          ].map((s) => (
-            <div key={s.lbl} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '10px 12px', border: '0.5px solid var(--border)' }}>
-              <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
-            </div>
-          ))}
-        </div>
+        {!search && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+            {[
+              { num: total, lbl: t('total_tasks'),  color: 'var(--text)' },
+              { num: done,  lbl: t('completed'),    color: 'var(--success)' },
+              { num: inProg,lbl: t('open'),         color: 'var(--warning)' },
+              { num: lists.length, lbl: t('nav_lists'), color: 'var(--text)' },
+            ].map((s) => (
+              <div key={s.lbl} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '10px 12px', border: '0.5px solid var(--border)' }}>
+                <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-          {filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
+          {search ? `${filtered.length} ${t('results')}` : filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
         </div>
 
         {filtered.length === 0 ? (
