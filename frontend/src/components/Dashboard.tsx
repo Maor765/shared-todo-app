@@ -16,7 +16,7 @@ import TaskDetailSheet from './TaskDetailSheet';
 export default function Dashboard() {
   const auth = useAuth();
   const queryClient = useQueryClient();
-  const { lists } = useLists();
+  const { lists, isLoading } = useLists();
   const { t } = useSettings();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
@@ -103,19 +103,40 @@ export default function Dashboard() {
               { num: inProg,lbl: t('open'),         color: 'var(--warning)' },
               { num: lists.length, lbl: t('nav_lists'), color: 'var(--text)' },
             ].map((s) => (
-              <div key={s.lbl} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '10px 12px', border: '0.5px solid var(--border)' }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
+              <div key={s.lbl} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '10px 12px', border: '0.5px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+                {isLoading ? (
+                  <>
+                    <div style={{ width: 40, height: 28, borderRadius: 6, background: 'var(--border)', marginBottom: 6, animation: 'pulse 1.4s ease-in-out infinite' }} />
+                    <div style={{ width: 70, height: 13, borderRadius: 4, background: 'var(--border)', animation: 'pulse 1.4s ease-in-out infinite' }} />
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
+                  </>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-          {search ? `${filtered.length} ${t('results')}` : filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
-        </div>
+        {!isLoading && (
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+            {search ? `${filtered.length} ${t('results')}` : filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
+          </div>
+        )}
 
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          [1,2,3,4,5].map((i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8 }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--border)', flexShrink: 0, animation: 'pulse 1.4s ease-in-out infinite' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ width: `${60 + i * 8}%`, height: 14, borderRadius: 4, background: 'var(--border)', marginBottom: 6, animation: 'pulse 1.4s ease-in-out infinite' }} />
+                <div style={{ width: 80, height: 11, borderRadius: 4, background: 'var(--border)', animation: 'pulse 1.4s ease-in-out infinite' }} />
+              </div>
+            </div>
+          ))
+        ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-faint)' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>✓</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>

@@ -73,6 +73,11 @@ input, select, textarea, button {
   font-family: inherit;
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 #root {
   display: flex;
   justify-content: center;
