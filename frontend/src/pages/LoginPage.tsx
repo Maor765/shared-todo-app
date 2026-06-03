@@ -39,7 +39,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} style={{ width: '100%', maxWidth: 280 }}>
           <input type="email" placeholder={t('email_ph')} value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-          <input type="password" placeholder={t('password_ph')} value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }} />
+          <input type="password" placeholder={t('password_ph')} value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, marginBottom: 6 }} />
+          <div style={{ textAlign: 'right', marginBottom: 16 }}>
+            <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none' }}>{t('forgot_password')}?</Link>
+          </div>
           {error && <div style={{ color: 'var(--danger)', fontSize: 14, marginBottom: 12 }}>{error}</div>}
           <button type="submit" disabled={loading}
             style={{ width: '100%', height: 40, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>

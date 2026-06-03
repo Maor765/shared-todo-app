@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { query } from '../db.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { PublicUser, AuthResponse } from '../types.js';
@@ -302,6 +303,74 @@ export async function getMe(
       user: toPublicUser(userResult.rows[0]),
       workspace: workspaceResult.rows[0],
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function forgotPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { email } = req.body;
+    if (!email) throw new AppError(400, 'Email required');
+
+    const userResult = await query(
+      `SELECT id FROM users WHERE LOWER(email) = LOWER($1)`,
+      [email],
+    );
+
+    // Always respond the same way to prevent email enumeration
+    if (userResult.rowCount === 0) {
+      res.json({ resetLink: null });
+      return;
+    }
+
+    const userId = userResult.rows[0].id;
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await query(`DELETE FROM password_reset_tokens WHERE user_id = $1`, [userId]);
+    await query(
+      `INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`,
+      [userId, token, expiresAt],
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+    res.json({ resetLink });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function resetPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) throw new AppError(400, 'Token and password required');
+    if (password.length < 6) throw new AppError(400, 'Password must be at least 6 characters');
+
+    const tokenResult = await query(
+      `SELECT user_id FROM password_reset_tokens WHERE token = $1 AND expires_at > NOW()`,
+      [token],
+    );
+
+    if (tokenResult.rowCount === 0) throw new AppError(400, 'Invalid or expired reset link');
+
+    const userId = tokenResult.rows[0].user_id;
+    const passwordHash = await bcryptjs.hash(password, 12);
+
+    await query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, userId]);
+    await query(`DELETE FROM password_reset_tokens WHERE user_id = $1`, [userId]);
+
+    res.json({ message: 'Password reset successfully' });
   } catch (error) {
     next(error);
   }

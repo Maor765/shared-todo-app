@@ -13,6 +13,16 @@ const en: T = {
   email_ph: 'Email', password_ph: 'Password',
   sign_in: 'Sign in', signing_in: 'Signing in...',
   no_account: "Don't have an account?", create_one: 'Create one',
+  forgot_password: 'Forgot password', forgot_password_sub: 'Enter your email and we\'ll give you a reset link.',
+  send_reset_link: 'Get reset link', reset_link_ready: 'Here is your reset link. Copy it or tap the button below:',
+  go_to_reset: 'Reset my password', email_not_found: 'No account found with that email.',
+  back_to_login: 'Back to login',
+  new_password: 'New password', new_password_sub: 'Choose a strong new password.',
+  new_password_ph: 'New password', confirm_password_ph: 'Confirm password',
+  reset_password: 'Reset password', password_reset_success: 'Password reset!',
+  redirecting_login: 'Redirecting to login...', passwords_no_match: 'Passwords do not match',
+  password_too_short: 'Password must be at least 6 characters',
+  invalid_reset_link: 'Invalid or missing reset link.', request_new_link: 'Request a new link',
   // Register
   create_account: 'Create account', create_account_sub: 'Set up your workspace',
   name_ph: 'Your name', creating: 'Creating...',
@@ -68,12 +78,24 @@ const en: T = {
   language: 'Language', hebrew: 'Hebrew (עברית)',
 };
 
+
+
 const he: T = {
   nav_dash: 'לוח בקרה', nav_lists: 'רשימות', nav_alerts: 'התראות', nav_team: 'צוות', nav_settings: 'הגדרות',
   loading: 'טוען...', save: 'שמור', saving: 'שומר...', cancel: 'ביטול',
   members: 'חברים', sublists_label: 'תת-רשימות',
   welcome_back: 'ברוך השב', sign_in_sub: 'התחבר לסביבת העבודה',
   email_ph: 'מייל', password_ph: 'סיסמה',
+  forgot_password: 'שכחתי סיסמה', forgot_password_sub: 'הכנס את המייל שלך ונשלח לך קישור לאיפוס.',
+  send_reset_link: 'קבל קישור לאיפוס', reset_link_ready: 'הנה קישור האיפוס שלך. העתק אותו או לחץ על הכפתור:',
+  go_to_reset: 'אפס סיסמה', email_not_found: 'לא נמצא חשבון עם המייל הזה.',
+  back_to_login: 'חזור להתחברות',
+  new_password: 'סיסמה חדשה', new_password_sub: 'בחר סיסמה חדשה וחזקה.',
+  new_password_ph: 'סיסמה חדשה', confirm_password_ph: 'אישור סיסמה',
+  reset_password: 'אפס סיסמה', password_reset_success: 'הסיסמה אופסה!',
+  redirecting_login: 'מעביר להתחברות...', passwords_no_match: 'הסיסמאות לא תואמות',
+  password_too_short: 'הסיסמה חייבת להכיל לפחות 6 תווים',
+  invalid_reset_link: 'קישור איפוס לא תקין.', request_new_link: 'בקש קישור חדש',
   sign_in: 'התחבר', signing_in: 'מתחבר...',
   no_account: 'אין לך חשבון?', create_one: 'צור חשבון',
   create_account: 'צור חשבון', create_account_sub: 'הגדר את סביבת העבודה',

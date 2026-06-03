@@ -8,5 +8,7 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.get('/me', authMiddleware, authController.getMe);
 router.post('/invites/:inviteId/accept', authMiddleware, authController.acceptInvite);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 export default router;
