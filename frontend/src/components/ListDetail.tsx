@@ -46,6 +46,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [showDelete, setShowDelete] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const openEdit = () => {
     if (!list) return;
@@ -133,7 +134,8 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   };
 
   const doAdd = async () => {
-    if (!addName.trim()) return;
+    if (!addName.trim() || adding) return;
+    setAdding(true);
     try {
       if (addType === 'sublist') {
         await sublistsAPI.createSublist(listId, addName.trim());
@@ -141,7 +143,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         await tasksAPI.createTask(listId, { text: addName.trim(), sublist_id: addSublist, assignee_id: addAssignee, due: addDue || null, notes: '' });
       }
       setAddName(''); setAddSublist(null); setAddAssignee(null); setAddDue(''); setAddSheet(false);
-    } catch {}
+    } catch {} finally { setAdding(false); }
   };
 
   const looseTasks = list.tasks.filter((task) => !task.sublist_id && filterTask(task));
@@ -333,8 +335,9 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           </div>
         )}
 
-        <button onClick={doAdd} style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
-          {addType === 'task' ? t('add_task') : t('add_sublist')}
+        <button onClick={doAdd} disabled={adding || !addName.trim()}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: adding || !addName.trim() ? 0.6 : 1 }}>
+          {adding ? '...' : addType === 'task' ? t('add_task') : t('add_sublist')}
         </button>
       </Sheet>
 
