@@ -111,8 +111,7 @@ export async function register(
       [workspaceId, userId, 'admin'],
     );
 
-    const token = signToken(userId, workspaceId, 'admin');
-
+    // Check for a pending invite — auto-accept so the user lands directly in the shared workspace
     const inviteResult = await query(
       `SELECT wi.id, wi.role, w.id as workspace_id, w.name as workspace_name
        FROM workspace_invites wi
@@ -122,14 +121,26 @@ export async function register(
       [email],
     );
 
-    const pendingInvite = inviteResult.rowCount > 0 ? {
-      id: inviteResult.rows[0].id,
-      workspace_id: inviteResult.rows[0].workspace_id,
-      workspace_name: inviteResult.rows[0].workspace_name,
-      role: inviteResult.rows[0].role,
-    } : null;
+    if (inviteResult.rowCount > 0) {
+      const invite = inviteResult.rows[0];
+      // Add to the inviting workspace
+      await query(
+        `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+        [invite.workspace_id, userId, invite.role],
+      );
+      // Clean up the invite
+      await query(`DELETE FROM workspace_invites WHERE id = $1`, [invite.id]);
+      // Delete the just-created empty own workspace
+      await query(`DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2`, [workspaceId, userId]);
+      await query(`DELETE FROM workspaces WHERE id = $1`, [workspaceId]);
+      // Issue token for the shared workspace
+      const sharedToken = signToken(userId, invite.workspace_id, invite.role);
+      res.status(201).json({ token: sharedToken, user: toPublicUser(user), workspace: { id: invite.workspace_id, name: invite.workspace_name } });
+      return;
+    }
 
-    res.status(201).json({ token, user: toPublicUser(user), workspace: { id: workspaceId, name: workspace.name }, pendingInvite });
+    const token = signToken(userId, workspaceId, 'admin');
+    res.status(201).json({ token, user: toPublicUser(user), workspace: { id: workspaceId, name: workspace.name } });
   } catch (error) {
     next(error);
   }

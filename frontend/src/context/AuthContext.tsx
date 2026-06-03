@@ -85,14 +85,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function register(name: string, email: string, password: string, workspace_name: string): Promise<WorkspaceInvite | null> {
     const response = await client.post('/api/auth/register', { name, email, password, workspace_name });
-    const { token: newToken, user: newUser, workspace: newWorkspace, pendingInvite } = response.data;
+    const { token: newToken, user: newUser, workspace: newWorkspace } = response.data;
     saveSession(newToken, newUser, newWorkspace);
-    if (!pendingInvite) {
-      setToken(newToken);
-      setUser(newUser);
-      setWorkspace(newWorkspace);
-    }
-    return pendingInvite || null;
+    setToken(newToken);
+    setUser(newUser);
+    setWorkspace(newWorkspace);
+    return null;
   }
 
   function finalizeSession() {
