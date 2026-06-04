@@ -174,7 +174,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', position: 'relative' }}>
       <div style={{ background: 'var(--bg-card)', padding: '12px 16px', borderBottom: '0.5px solid var(--border)' }}>
         <button onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 6, padding: 0 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -248,7 +248,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         onChange={setFilter}
       />
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 16px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 80px' }}>
         {(list.tasks.some((t) => !t.done) || list.tasks.some((t) => t.done)) && (
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             {list.tasks.some((t) => !t.done) && (
@@ -298,11 +298,25 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           </div>
         )}
 
-        <button onClick={() => setAddSheet(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--bg)', borderRadius: 10, border: '0.5px dashed var(--border-mid)', color: 'var(--text-faint)', fontSize: 15, cursor: 'pointer', width: '100%' }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-          {t('add_task_sublist')}
-        </button>
       </div>
+
+      {/* Floating action button */}
+      <button
+        onClick={() => setAddSheet(true)}
+        style={{
+          position: 'absolute', bottom: 20, right: 20,
+          width: 52, height: 52, borderRadius: '50%',
+          background: 'var(--primary)', color: '#fff',
+          border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          zIndex: 10,
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
 
       <Sheet open={addSheet} onClose={() => setAddSheet(false)} title={`${t('add_to')} ${list.name}`}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
