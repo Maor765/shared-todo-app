@@ -108,9 +108,10 @@ export default function Team() {
           {members.map((m, i) => (
             <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < members.length - 1 ? '0.5px solid var(--border-subtle)' : 'none' }}>
               <Avatar member={m} size={36} />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{m.name}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, textTransform: 'capitalize' }}>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>
+                <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 1, textTransform: 'capitalize' }}>
                   {m.role === 'admin' ? t('admin_role') : t('member_role')} · {lists.filter((l) => l.members?.some((ml) => ml.id === m.id)).length} {t('nav_lists').toLowerCase()}
                 </div>
               </div>

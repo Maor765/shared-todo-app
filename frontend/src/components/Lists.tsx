@@ -273,6 +273,7 @@ export default function Lists({ onSelectList }: ListsProps) {
         flexDirection: "column",
         flex: 1,
         overflow: "hidden",
+        position: "relative",
       }}
     >
       <TopBar
@@ -334,7 +335,7 @@ export default function Lists({ onSelectList }: ListsProps) {
         </div>
       )}
 
-      <div style={{ flex: 1, overflowY: "auto", padding: "4px 16px 16px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "4px 16px 80px" }}>
         {search ? (
           <>
             <div
@@ -524,6 +525,23 @@ export default function Lists({ onSelectList }: ListsProps) {
       {menuListId && (
         <div onClick={() => setMenuListId(null)} style={{ position: "fixed", inset: 0, zIndex: 15 }} />
       )}
+
+      <button
+        onClick={() => setShowCreate(true)}
+        style={{
+          position: "absolute", bottom: 20, right: 20,
+          width: 52, height: 52, borderRadius: "50%",
+          background: "var(--primary)", color: "#fff",
+          border: "none", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+          zIndex: 10,
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
 
       <Sheet open={!!editList} onClose={() => setEditList(null)} title={t("edit_list")}>
         <div style={{ marginBottom: 14 }}>
