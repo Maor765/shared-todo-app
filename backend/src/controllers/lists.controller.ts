@@ -35,14 +35,28 @@ async function getListWithMembers(
 
   const list = listResult.rows[0];
 
-  const membersResult = await query(
-    `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, u.role, u.status
-     FROM users u
-     JOIN list_members lm ON u.id = lm.user_id
-     WHERE lm.list_id = $1
-     ORDER BY u.created_at ASC`,
-    [listId],
-  );
+  let membersResult;
+  if (list.shared) {
+    // For shared lists, show all workspace members
+    membersResult = await query(
+      `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, u.role, u.status
+       FROM users u
+       JOIN workspace_members wm ON u.id = wm.user_id
+       WHERE wm.workspace_id = $1
+       ORDER BY u.created_at ASC`,
+      [list.workspace_id],
+    );
+  } else {
+    // For private lists, show only explicit members
+    membersResult = await query(
+      `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, u.role, u.status
+       FROM users u
+       JOIN list_members lm ON u.id = lm.user_id
+       WHERE lm.list_id = $1
+       ORDER BY u.created_at ASC`,
+      [listId],
+    );
+  }
 
   return {
     ...list,
