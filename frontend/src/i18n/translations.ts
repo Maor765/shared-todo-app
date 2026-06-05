@@ -72,7 +72,7 @@ const en: T = {
   member_desc: 'Can view and edit tasks', admin_desc: 'Can also manage members',
   send_invite: 'Send invite', sending: 'Sending...', invite_sent: '✅ Invite sent!',
   active: 'Active', away: 'Away', active_lists: 'active lists',
-  pending_badge: 'Pending', cancel_invite: 'Cancel invite', log_out: 'Log out',
+  pending_badge: 'Pending', cancel_invite: 'Cancel invite', remove_member: 'Remove member', log_out: 'Log out',
   // Settings
   settings: 'Settings', appearance: 'Appearance', dark_mode: 'Dark mode',
   language: 'Language', hebrew: 'Hebrew (עברית)',
@@ -141,7 +141,7 @@ const he: T = {
   member_desc: 'יכול לצפות ולערוך משימות', admin_desc: 'יכול גם לנהל חברים',
   send_invite: 'שלח הזמנה', sending: 'שולח...', invite_sent: '✅ ההזמנה נשלחה!',
   active: 'פעיל', away: 'לא זמין', active_lists: 'רשימות פעילות',
-  pending_badge: 'ממתין', cancel_invite: 'בטל הזמנה', log_out: 'התנתק',
+  pending_badge: 'ממתין', cancel_invite: 'בטל הזמנה', remove_member: 'הסר חבר', log_out: 'התנתק',
   settings: 'הגדרות', appearance: 'מראה', dark_mode: 'מצב כהה',
   language: 'שפה', hebrew: 'עברית',
   export_section: 'נתונים', export_csv: 'ייצוא ל-CSV', export_btn: 'ייצוא',

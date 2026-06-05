@@ -63,8 +63,18 @@ export default function Team() {
     },
   });
 
+  const removeMemberMutation = useMutation({
+    mutationFn: (userId: string) => membersAPI.removeMember(userId),
+    onSuccess: (_, userId) => {
+      queryClient.setQueryData<PublicUser[]>(['members'], (prev) =>
+        (prev ?? []).filter((m) => m.id !== userId),
+      );
+    },
+  });
+
   const handleInvite = () => { if (inviteEmail) inviteMutation.mutate(); };
   const handleDeleteInvite = (inviteId: string) => deleteInviteMutation.mutate(inviteId);
+  const handleRemoveMember = (userId: string) => removeMemberMutation.mutate(userId);
 
   const current = members.find((m) => m.id === auth.user?.id);
 
@@ -116,6 +126,22 @@ export default function Team() {
                 </div>
               </div>
               <Badge variant={m.status === 'active' ? 'info' : 'neutral'}>{m.status === 'active' ? t('active') : t('away')}</Badge>
+              {m.id !== auth.user?.id && auth.user?.role === 'admin' && (
+                <button
+                  onClick={() => handleRemoveMember(m.id)}
+                  disabled={removeMemberMutation.isPending}
+                  title={t('remove_member')}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8,
+                    color: 'var(--danger)', display: 'flex', alignItems: 'center', opacity: removeMemberMutation.isPending ? 0.6 : 1
+                  }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2" />
+                  </svg>
+                </button>
+              )}
             </div>
           ))}
         </div>
