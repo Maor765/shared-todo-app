@@ -196,7 +196,7 @@ export async function login(
 
     const response: AuthResponse = {
       token,
-      user: toPublicUser(user),
+      user: toPublicUser({ ...user, role: workspace.ws_role }),
       workspace: { id: workspace.id, name: workspace.name },
     };
 
