@@ -332,6 +332,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               flex: 1,
             }}
           />
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 16, padding: 0 }}>×</button>}
         </div>
       )}
 
@@ -360,7 +361,16 @@ export default function Lists({ onSelectList }: ListsProps) {
                   fontSize: 15,
                 }}
               >
-                {t("no_tasks_match")} "{search}"
+                <div style={{ marginBottom: 16 }}>{t("no_tasks_match")} "{search}"</div>
+                <button
+                  onClick={() => { setNewName(search); setShowCreate(true); setSearch(''); }}
+                  style={{
+                    padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff',
+                    border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                  }}
+                >
+                  {t('create_list')} "{search}"
+                </button>
               </div>
             ) : (
               <div
