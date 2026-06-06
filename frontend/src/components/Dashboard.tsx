@@ -10,6 +10,7 @@ import { Avatar } from './ui/Avatar';
 import { Badge } from './ui/Badge';
 import { CheckCircle } from './ui/CheckCircle';
 import { IconBtn } from './ui/IconBtn';
+import { Sheet } from './ui/Sheet';
 import { tasksAPI } from '../api/tasks.api';
 import TaskDetailSheet from './TaskDetailSheet';
 
@@ -22,6 +23,9 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [taskSheet, setTaskSheet] = useState<DBTask | null>(null);
+  const [showCreateTask, setShowCreateTask] = useState(false);
+  const [selectedListId, setSelectedListId] = useState('');
+  const [creating, setCreating] = useState(false);
 
   const allTasks = lists.flatMap((l) => l.tasks?.map((task) => ({ ...task, list: l })) || []);
   const today = new Date().toISOString().slice(0, 10);
@@ -57,6 +61,18 @@ export default function Dashboard() {
     patch(newDone);
     try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
     catch { patch(task.done); }
+  };
+
+  const handleCreateTask = async () => {
+    if (!selectedListId || !search.trim()) return;
+    setCreating(true);
+    try {
+      await tasksAPI.createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
+      setSearch('');
+      setShowCreateTask(false);
+      setSelectedListId('');
+    } catch {}
+    finally { setCreating(false); }
   };
 
   return (
@@ -142,6 +158,14 @@ export default function Dashboard() {
             <div style={{ fontSize: 32, marginBottom: 8 }}>✓</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
             <div style={{ fontSize: 14, marginTop: 4 }}>{t('no_tasks_filter')}</div>
+            {search && (
+              <button
+                onClick={() => setShowCreateTask(true)}
+                style={{ marginTop: 20, padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                {t('create_task')} "{search}"
+              </button>
+            )}
           </div>
         ) : (
           filtered.map((task) => {
@@ -179,6 +203,38 @@ export default function Dashboard() {
           onDelete={() => setTaskSheet(null)}
         />
       )}
+
+      <Sheet open={showCreateTask} onClose={() => { setShowCreateTask(false); setSelectedListId(''); }} title={`${t('add_task')}: "${search}"`}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
+          {t('select_list')}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+          {lists.map((list) => (
+            <button
+              key={list.id}
+              onClick={() => setSelectedListId(list.id)}
+              style={{
+                padding: '12px 14px', borderRadius: 10, border: selectedListId === list.id ? '2px solid var(--primary)' : '0.5px solid var(--border)',
+                background: selectedListId === list.id ? 'var(--primary-bg)' : 'var(--bg-card)', cursor: 'pointer', textAlign: 'left',
+                color: selectedListId === list.id ? 'var(--primary)' : 'var(--text)', fontWeight: 500
+              }}
+            >
+              <span style={{ fontSize: 16, marginRight: 8 }}>{list.emoji}</span>
+              {list.name}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={handleCreateTask}
+          disabled={!selectedListId || creating}
+          style={{
+            width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
+            border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+          }}
+        >
+          {creating ? '...' : t('add_task')}
+        </button>
+      </Sheet>
     </div>
   );
 }

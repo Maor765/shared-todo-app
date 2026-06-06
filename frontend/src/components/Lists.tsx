@@ -35,6 +35,9 @@ export default function Lists({ onSelectList }: ListsProps) {
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [menuListId, setMenuListId] = useState<string | null>(null);
+  const [showCreateTask, setShowCreateTask] = useState(false);
+  const [selectedListId, setSelectedListId] = useState('');
+  const [creating, setCreating] = useState(false);
   const [editList, setEditList] = useState<ListWithMembers | null>(null);
   const [editName, setEditName] = useState("");
   const [editEmoji, setEditEmoji] = useState("📋");
@@ -103,6 +106,18 @@ export default function Lists({ onSelectList }: ListsProps) {
     patchLists(newDone);
     try { await tasksAPI.updateTask(listId, task.id, { done: newDone }); }
     catch { patchLists(task.done); }
+  };
+
+  const handleCreateTask = async () => {
+    if (!selectedListId || !search.trim()) return;
+    setCreating(true);
+    try {
+      await tasksAPI.createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
+      setSearch('');
+      setShowCreateTask(false);
+      setSelectedListId('');
+    } catch {}
+    finally { setCreating(false); }
   };
 
   const taskResults: Array<{ task: DBTask; list: ListWithMembers }> = search
@@ -362,15 +377,26 @@ export default function Lists({ onSelectList }: ListsProps) {
                 }}
               >
                 <div style={{ marginBottom: 16 }}>{t("no_tasks_match")} "{search}"</div>
-                <button
-                  onClick={() => { setNewName(search); setShowCreate(true); setSearch(''); }}
-                  style={{
-                    padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff',
-                    border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
-                  }}
-                >
-                  {t('create_list')} "{search}"
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <button
+                    onClick={() => { setShowCreateTask(true); }}
+                    style={{
+                      padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff',
+                      border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                    }}
+                  >
+                    {t('add_task')} "{search}"
+                  </button>
+                  <button
+                    onClick={() => { setNewName(search); setShowCreate(true); setSearch(''); }}
+                    style={{
+                      padding: '8px 16px', borderRadius: 10, background: 'var(--bg-card)', color: 'var(--text)',
+                      border: '0.5px solid var(--border)', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                    }}
+                  >
+                    {t('create_list')} "{search}"
+                  </button>
+                </div>
               </div>
             ) : (
               <div
@@ -724,6 +750,38 @@ export default function Lists({ onSelectList }: ListsProps) {
           }}
         >
           {t("create_list")}
+        </button>
+      </Sheet>
+
+      <Sheet open={showCreateTask} onClose={() => { setShowCreateTask(false); setSelectedListId(''); }} title={`${t('add_task')}: "${search}"`}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
+          {t('select_list')}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+          {lists.map((list) => (
+            <button
+              key={list.id}
+              onClick={() => setSelectedListId(list.id)}
+              style={{
+                padding: '12px 14px', borderRadius: 10, border: selectedListId === list.id ? '2px solid var(--primary)' : '0.5px solid var(--border)',
+                background: selectedListId === list.id ? 'var(--primary-bg)' : 'var(--bg-card)', cursor: 'pointer', textAlign: 'left',
+                color: selectedListId === list.id ? 'var(--primary)' : 'var(--text)', fontWeight: 500
+              }}
+            >
+              <span style={{ fontSize: 16, marginRight: 8 }}>{list.emoji}</span>
+              {list.name}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={handleCreateTask}
+          disabled={!selectedListId || creating}
+          style={{
+            width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
+            border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+          }}
+        >
+          {creating ? '...' : t('add_task')}
         </button>
       </Sheet>
     </div>

@@ -67,7 +67,7 @@ const en: T = {
   // Team
   team: 'Team', workspace_members: 'Workspace members', all_members: 'All members',
   pending_invites: 'Pending invites', invite_to_ws: 'Invite to workspace',
-  email_address: 'Email address', role_label: 'Role',
+  email_address: 'Email address', role_label: 'Role', select_list: 'Select a list',
   member_role: 'Member', admin_role: 'Admin',
   member_desc: 'Can view and edit tasks', admin_desc: 'Can also manage members',
   send_invite: 'Send invite', sending: 'Sending...', invite_sent: '✅ Invite sent!',
@@ -139,7 +139,7 @@ const he: T = {
   email_address: 'כתובת מייל', role_label: 'תפקיד',
   member_role: 'חבר', admin_role: 'מנהל',
   member_desc: 'יכול לצפות ולערוך משימות', admin_desc: 'יכול גם לנהל חברים',
-  send_invite: 'שלח הזמנה', sending: 'שולח...', invite_sent: '✅ ההזמנה נשלחה!',
+  send_invite: 'שלח הזמנה', sending: 'שולח...', invite_sent: '✅ ההזמנה נשלחה!', select_list: 'בחר רשימה',
   active: 'פעיל', away: 'לא זמין', active_lists: 'רשימות פעילות',
   pending_badge: 'ממתין', cancel_invite: 'בטל הזמנה', remove_member: 'הסר חבר', log_out: 'התנתק',
   settings: 'הגדרות', appearance: 'מראה', dark_mode: 'מצב כהה',
