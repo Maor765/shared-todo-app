@@ -33,7 +33,7 @@ function signToken(userId: string, workspaceId: string, role: string): string {
   return jwt.sign(
     { sub: userId, workspace_id: workspaceId, role },
     process.env.JWT_SECRET!,
-    { expiresIn: '24h' },
+    { expiresIn: '180d' },
   );
 }
 
