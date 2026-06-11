@@ -341,13 +341,13 @@ export default function Lists({ onSelectList }: ListsProps) {
             style={{
               border: "none",
               background: "none",
-              fontSize: 15,
+              fontSize: 17,
               color: "var(--text)",
               outline: "none",
               flex: 1,
             }}
           />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 16, padding: 0 }}>×</button>}
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 20, padding: 2 }}>×</button>}
         </div>
       )}
 
