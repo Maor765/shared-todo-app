@@ -279,29 +279,24 @@ export async function getMe(
       throw new AppError(401, 'Unauthorized');
     }
 
-    const userResult = await query(
-      `SELECT id, email, name, initials, color, text_color, role, status FROM users WHERE id = $1`,
-      [userId],
+    const result = await query(
+      `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, u.status,
+              wm.role as ws_role, w.id as ws_id, w.name as ws_name
+       FROM users u
+       JOIN workspace_members wm ON wm.user_id = u.id AND wm.workspace_id = $2
+       JOIN workspaces w ON w.id = wm.workspace_id
+       WHERE u.id = $1`,
+      [userId, workspaceId],
     );
 
-    if (userResult.rowCount === 0) {
-      throw new AppError(404, 'User not found');
-    }
-
-    const workspaceResult = await query(
-      `SELECT w.id, w.name FROM workspaces w
-       JOIN workspace_members wm ON wm.workspace_id = w.id
-       WHERE w.id = $1 AND wm.user_id = $2`,
-      [workspaceId, userId],
-    );
-
-    if (workspaceResult.rowCount === 0) {
+    if (result.rowCount === 0) {
       throw new AppError(401, 'Not a member of this workspace');
     }
 
+    const row = result.rows[0];
     res.json({
-      user: toPublicUser(userResult.rows[0]),
-      workspace: workspaceResult.rows[0],
+      user: toPublicUser({ ...row, role: row.ws_role }),
+      workspace: { id: row.ws_id, name: row.ws_name },
     });
   } catch (error) {
     next(error);
