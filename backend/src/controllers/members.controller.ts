@@ -28,7 +28,7 @@ export async function getMembers(
     if (!workspaceId) throw new AppError(401, 'Unauthorized');
 
     const result = await query(
-      `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, u.role, u.status
+      `SELECT u.id, u.email, u.name, u.initials, u.color, u.text_color, wm.role, u.status
        FROM users u
        JOIN workspace_members wm ON u.id = wm.user_id
        WHERE wm.workspace_id = $1
