@@ -6,4 +6,6 @@ export const authAPI = {
   login: (email: string, password: string) =>
     client.post('/api/auth/login', { email, password }),
   getMe: () => client.get('/api/auth/me'),
+  googleAuth: (credential: string) =>
+    client.post('/api/auth/google', { credential }),
 };

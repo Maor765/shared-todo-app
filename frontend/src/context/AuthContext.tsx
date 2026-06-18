@@ -8,6 +8,7 @@ export interface AuthContextValue {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
   register: (name: string, email: string, password: string, workspace_name: string) => Promise<WorkspaceInvite | null>;
   acceptInvite: (inviteId: string) => Promise<void>;
   finalizeSession: () => void;
@@ -83,6 +84,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setWorkspace(newWorkspace);
   }
 
+  async function googleLogin(credential: string) {
+    const response = await client.post('/api/auth/google', { credential });
+    const { token: newToken, user: newUser, workspace: newWorkspace } = response.data;
+    saveSession(newToken, newUser, newWorkspace);
+    setToken(newToken);
+    setUser(newUser);
+    setWorkspace(newWorkspace);
+  }
+
   async function register(name: string, email: string, password: string, workspace_name: string): Promise<WorkspaceInvite | null> {
     const response = await client.post('/api/auth/register', { name, email, password, workspace_name });
     const { token: newToken, user: newUser, workspace: newWorkspace } = response.data;
@@ -121,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, workspace, token, isLoading, login, register, acceptInvite, finalizeSession, logout }}>
+    <AuthContext.Provider value={{ user, workspace, token, isLoading, login, googleLogin, register, acceptInvite, finalizeSession, logout }}>
       {children}
     </AuthContext.Provider>
   );
