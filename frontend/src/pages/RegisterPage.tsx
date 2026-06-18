@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 import { WorkspaceInvite } from '../types';
@@ -19,6 +20,16 @@ export default function RegisterPage() {
   useEffect(() => {
     if (auth.user && !pendingInvite) navigate({ to: '/' });
   }, [auth.user]);
+
+  const handleGoogleSuccess = async (response: { credential?: string }) => {
+    if (!response.credential) return;
+    setError('');
+    try {
+      await auth.googleLogin(response.credential);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Google sign-in failed');
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +69,16 @@ export default function RegisterPage() {
             style={{ width: '100%', height: 40, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>
             {loading ? t('creating') : t('create_account')}
           </button>
+          <div style={{ margin: '16px 0 4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+              <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>or</span>
+              <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google sign-in failed')} width="280" />
+            </div>
+          </div>
         </form>
 
         <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 20 }}>

@@ -1,5 +1,6 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 
@@ -29,7 +30,22 @@ export default function LoginPage() {
     }
   };
 
-  const inputStyle = { width: '100%', height: 40, borderRadius: 10, background: 'var(--bg-card)', border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 15, marginBottom: 12, outline: 'none', color: 'var(--text)' } as const;
+  const handleGoogleSuccess = async (response: { credential?: string }) => {
+    if (!response.credential) return;
+    setError('');
+    try {
+      await auth.googleLogin(response.credential);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Google sign-in failed');
+    }
+  };
+
+  const inputStyle = {
+    width: '100%', height: 40, borderRadius: 10,
+    background: 'var(--bg-card)', border: '0.5px solid var(--border)',
+    padding: '0 12px', fontSize: 15, marginBottom: 12,
+    outline: 'none', color: 'var(--text)',
+  } as const;
 
   return (
     <div style={{ width: '100%', maxWidth: 480, minHeight: '100dvh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -50,7 +66,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 20 }}>
+        <div style={{ width: '100%', maxWidth: 280, margin: '20px 0 4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>or</span>
+            <div style={{ flex: 1, height: '0.5px', background: 'var(--border)' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google sign-in failed')} width="280" />
+          </div>
+        </div>
+
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 16 }}>
           {t('no_account')}{' '}
           <Link to="/register" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>{t('create_one')}</Link>
         </p>
