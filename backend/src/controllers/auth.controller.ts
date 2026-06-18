@@ -2,9 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import { query } from '../db.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { PublicUser, AuthResponse } from '../types.js';
+
+const googleOAuthClient = new OAuth2Client();
 
 const AVATAR_PALETTE = [
   { color: '#B5D4F4', text_color: '#0C447C' },
@@ -368,5 +371,144 @@ export async function resetPassword(
     res.json({ message: 'Password reset successfully' });
   } catch (error) {
     next(error);
+  }
+}
+
+export async function googleAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { credential } = req.body;
+    if (!credential) throw new AppError(400, 'Missing credential');
+
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) throw new AppError(500, 'Google auth not configured');
+
+    const ticket = await googleOAuthClient.verifyIdToken({
+      idToken: credential,
+      audience: googleClientId,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) throw new AppError(401, 'Invalid Google token');
+
+    const { sub: googleId, email: rawEmail, name: googleName } = payload;
+    if (!rawEmail) throw new AppError(400, 'Google account has no email');
+
+    const email = rawEmail.toLowerCase();
+    const name = googleName || email.split('@')[0];
+
+    // Case 1: returning Google user matched by google_id
+    let userResult = await query(
+      `SELECT id, email, name, initials, color, text_color, role, status
+       FROM users WHERE google_id = $1`,
+      [googleId],
+    );
+
+    if (userResult.rowCount === 0) {
+      const emailResult = await query(
+        `SELECT id, email, name, initials, color, text_color, role, status
+         FROM users WHERE email = $1`,
+        [email],
+      );
+
+      if (emailResult.rowCount > 0) {
+        // Case 2: email matches existing account — auto-link
+        await query(`UPDATE users SET google_id = $1 WHERE email = $2`, [googleId, email]);
+        userResult = emailResult;
+      } else {
+        // Case 3: brand new user
+        const userCountResult = await query(`SELECT COUNT(*) as count FROM users`);
+        const userCount = parseInt(userCountResult.rows[0].count, 10);
+        const { color, text_color } = getAvatarColor(userCount);
+        const initials = getInitials(name);
+
+        const newUserResult = await query(
+          `INSERT INTO users (email, password_hash, name, initials, color, text_color, role, status, google_id)
+           VALUES ($1, NULL, $2, $3, $4, $5, 'member', 'active', $6)
+           RETURNING id, email, name, initials, color, text_color, role, status`,
+          [email, name, initials, color, text_color, googleId],
+        );
+
+        const user = newUserResult.rows[0];
+        const userId = user.id;
+        const workspaceName = `${name}'s Workspace`;
+
+        const workspaceResult = await query(
+          `INSERT INTO workspaces (name, owner_id) VALUES ($1, $2) RETURNING id, name`,
+          [workspaceName, userId],
+        );
+        const newWorkspace = workspaceResult.rows[0];
+        const workspaceId = newWorkspace.id;
+
+        await query(
+          `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'admin')`,
+          [workspaceId, userId],
+        );
+
+        // Honour a pending invite (same logic as register())
+        const inviteResult = await query(
+          `SELECT wi.id, wi.role, w.id as workspace_id, w.name as workspace_name
+           FROM workspace_invites wi
+           JOIN workspaces w ON w.id = wi.workspace_id
+           WHERE LOWER(wi.email) = $1 LIMIT 1`,
+          [email],
+        );
+
+        if (inviteResult.rowCount > 0) {
+          const invite = inviteResult.rows[0];
+          await query(
+            `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+            [invite.workspace_id, userId, invite.role],
+          );
+          await query(`DELETE FROM workspace_invites WHERE id = $1`, [invite.id]);
+          await query(`DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2`, [workspaceId, userId]);
+          await query(`DELETE FROM workspaces WHERE id = $1`, [workspaceId]);
+          const sharedToken = signToken(userId, invite.workspace_id, invite.role);
+          res.status(201).json({
+            token: sharedToken,
+            user: toPublicUser(user),
+            workspace: { id: invite.workspace_id, name: invite.workspace_name },
+          });
+          return;
+        }
+
+        const token = signToken(userId, workspaceId, 'admin');
+        res.status(201).json({
+          token,
+          user: toPublicUser(user),
+          workspace: { id: workspaceId, name: workspaceName },
+        });
+        return;
+      }
+    }
+
+    // Existing user (Case 1 or auto-linked Case 2) — look up their workspace
+    const user = userResult.rows[0];
+    const workspaceResult = await query(
+      `SELECT workspaces.id, workspaces.name, workspace_members.role as ws_role
+       FROM workspace_members
+       JOIN workspaces ON workspaces.id = workspace_members.workspace_id
+       WHERE workspace_members.user_id = $1
+       ORDER BY (workspaces.owner_id = $1) DESC
+       LIMIT 1`,
+      [user.id],
+    );
+
+    if (workspaceResult.rowCount === 0) throw new AppError(500, 'User workspace not found');
+
+    const workspace = workspaceResult.rows[0];
+    const token = signToken(user.id, workspace.id, workspace.ws_role);
+    res.json({
+      token,
+      user: toPublicUser({ ...user, role: workspace.ws_role }),
+      workspace: { id: workspace.id, name: workspace.name },
+    });
+  } catch (error) {
+    if (error instanceof AppError) return next(error);
+    // google-auth-library throws on invalid/expired tokens — never expose its internals
+    next(new AppError(401, 'Invalid Google token'));
   }
 }
