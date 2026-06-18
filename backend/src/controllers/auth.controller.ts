@@ -174,6 +174,11 @@ export async function login(
     }
 
     const user = userResult.rows[0];
+
+    if (!user.password_hash) {
+      throw new AppError(401, 'Invalid credentials');
+    }
+
     const passwordMatch = await bcryptjs.compare(password, user.password_hash);
 
     if (!passwordMatch) {
