@@ -169,7 +169,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</div>
+          <div style={{ fontSize: 17, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</div>
           <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
             {assignee && <Avatar member={assignee} size={16} />}
             {assignee && <span>{assignee.name.split(' ')[0]}</span>}
