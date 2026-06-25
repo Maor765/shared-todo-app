@@ -20,6 +20,14 @@ const EMOJIS = [
   "🛒","🏠","🍕","💪","📚","🎵","✈️","🌿","💰","🎮","🏋️","🧠","❤️","🌍","⚡",
   "🎁","🔑","🌈","🍎","🏆","🎬","🧪","🌙","☀️","🎓","🏖️","🐾","🌸","🍀","🔔",
   "💊","🛠️","📷","🎤","🚗","🏡","🧹","🍳","☕","🎂","🛁","🌻","🦋","🐶","🐱",
+  "👶","🧒","👦","👧","🧑","👩","👨","🧓","👴","👵","👶🏻","👶🏽","👶🏿",
+  "🍼","🧸","🪀","🎠","🎡","🎢","🎈","🎀","🧦","👟","🩹","🛏️","🧷","🪆",
+  "🐣","🐥","🐇","🐰","🦊","🐻","🐼","🐨","🦁","🐯","🐸","🦄","🐲","🦕",
+  "🌺","🌷","🌼","🌻","🌹","💐","🍓","🍒","🍭","🍬","🍡","🧁","🎀","🍰",
+  "🏄","⛷️","🏊","🤸","🧗","🚴","🎽","🥇","🏅","🎖️","🥊","⚽","🏀","🎾",
+  "🎻","🥁","🎹","🎸","🎺","🪗","🎷","🎙️","🎧","🎼","🎵","🎭","🖼️","🎞️",
+  "🌮","🍜","🍣","🥗","🫕","🍲","🧆","🥙","🍔","🌭","🍟","🧇","🥞","🍩",
+  "🛸","🌕","⭐","🌠","🌌","🪐","☄️","🔭","🛰️","👽","🤖","👾","🕹️","🌐",
 ];
 
 interface ListDetailProps { listId: string; onBack: () => void; }
@@ -388,8 +396,8 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>{t('emoji_label')}</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {EMOJIS.map((e) => (
-              <button key={e} onClick={() => setEditEmoji(e)}
+            {EMOJIS.map((e, i) => (
+              <button key={i} onClick={() => setEditEmoji(e)}
                 style={{ width: 36, height: 36, borderRadius: 8, fontSize: 20, cursor: 'pointer', background: editEmoji === e ? 'var(--primary-bg)' : 'var(--bg-input)', border: editEmoji === e ? '2px solid var(--primary)' : '0.5px solid var(--border)' }}>
                 {e}
               </button>
