@@ -173,6 +173,11 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
             {assignee && <Avatar member={assignee} size={16} />}
             {assignee && <span>{assignee.name.split(' ')[0]}</span>}
+            {task.amount != null && (
+              <span style={{ background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
+                {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
+              </span>
+            )}
           </div>
         </div>
         {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}

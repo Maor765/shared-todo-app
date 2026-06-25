@@ -19,11 +19,12 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
   const [assigneeId, setAssigneeId] = useState(task.assignee_id);
   const [due, setDue] = useState(task.due ? task.due.slice(0, 10) : '');
   const [sublistId, setSublistId] = useState(task.sublist_id);
+  const [amount, setAmount] = useState(task.amount != null ? String(task.amount) : '');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
-    try { await tasksAPI.updateTask(listId, task.id, { text, notes, assignee_id: assigneeId, due: due || null, sublist_id: sublistId }); onSave(); }
+    try { await tasksAPI.updateTask(listId, task.id, { text, notes, assignee_id: assigneeId, due: due || null, sublist_id: sublistId, amount: amount !== '' ? parseFloat(amount) : null }); onSave(); }
     catch {} finally { setSaving(false); }
   };
 
@@ -77,6 +78,19 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
             )}
           </div>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>Amount</div>
+        <input
+          type="number"
+          min="0"
+          step="any"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="—"
+          style={{ ...inputStyle, width: '50%' }}
+        />
       </div>
 
       {(list.sublists || []).length > 0 && (

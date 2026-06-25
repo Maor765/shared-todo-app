@@ -67,6 +67,7 @@ CREATE TABLE tasks (
   assignee_id UUID REFERENCES users(id) ON DELETE SET NULL,
   due         DATE,
   notes       TEXT NOT NULL DEFAULT '',
+  amount      FLOAT8,
   created_by  UUID NOT NULL REFERENCES users(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()

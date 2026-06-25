@@ -22,7 +22,7 @@ export async function createTask(
     const { listId } = req.params;
     const userId = req.user?.sub;
     const workspaceId = req.user?.workspace_id;
-    const { text, sublist_id, assignee_id, due, notes } = req.body;
+    const { text, sublist_id, assignee_id, due, notes, amount } = req.body;
 
     if (!userId || !workspaceId) {
       throw new AppError(401, 'Unauthorized');
@@ -33,10 +33,10 @@ export async function createTask(
     }
 
     const result = await query(
-      `INSERT INTO tasks (list_id, sublist_id, text, assignee_id, due, notes, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, created_by, created_at, updated_at`,
-      [listId, sublist_id || null, text, assignee_id || null, due || null, notes || '', userId],
+      `INSERT INTO tasks (list_id, sublist_id, text, assignee_id, due, notes, amount, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, created_by, created_at, updated_at`,
+      [listId, sublist_id || null, text, assignee_id || null, due || null, notes || '', amount ?? null, userId],
     );
 
     const task = result.rows[0];
@@ -86,7 +86,7 @@ export async function updateTask(
     const { listId, id: taskId } = req.params;
     const userId = req.user?.sub;
     const workspaceId = req.user?.workspace_id;
-    const { text, done, sublist_id, assignee_id, due, notes } = req.body;
+    const { text, done, sublist_id, assignee_id, due, notes, amount } = req.body;
 
     if (!userId || !workspaceId) {
       throw new AppError(401, 'Unauthorized');
@@ -137,12 +137,17 @@ export async function updateTask(
       values.push(notes);
     }
 
+    if (amount !== undefined) {
+      updates.push(`amount = $${paramIndex++}`);
+      values.push(amount ?? null);
+    }
+
     updates.push(`updated_at = NOW()`);
     values.push(taskId, listId);
 
     const result = await query(
       `UPDATE tasks SET ${updates.join(', ')} WHERE id = $${paramIndex} AND list_id = $${paramIndex + 1}
-       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, created_by, created_at, updated_at`,
+       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, created_by, created_at, updated_at`,
       values,
     );
 

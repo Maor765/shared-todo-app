@@ -57,6 +57,7 @@ export interface DBTask {
   assignee_id: string | null;
   due: string | null;
   notes: string;
+  amount: number | null;
   created_by: string;
   created_at: string;
   updated_at: string;

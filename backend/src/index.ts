@@ -56,6 +56,7 @@ async function main() {
   try {
     await query('SELECT 1');
     console.log('Database connected');
+    await query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS amount FLOAT8');
 
     server.listen(port, () => {
       console.log(`Server running on port ${port}`);
