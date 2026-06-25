@@ -236,7 +236,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
               <Avatar member={m} size={22} />
             </div>
           ))}
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 4 }}>{(list.members || []).length} {t('members')}</span>
         </div>
       </div>
 
