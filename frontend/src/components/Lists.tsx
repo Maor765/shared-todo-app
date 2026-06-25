@@ -454,17 +454,22 @@ export default function Lists({ onSelectList }: ListsProps) {
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: 16,
-                          color: task.done
-                            ? "var(--text-faint)"
-                            : "var(--text)",
-                          textDecoration: task.done ? "line-through" : "none",
-                          lineHeight: 1.3,
-                        }}
-                      >
-                        {task.text}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span
+                          style={{
+                            fontSize: 16,
+                            color: task.done ? "var(--text-faint)" : "var(--text)",
+                            textDecoration: task.done ? "line-through" : "none",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {task.text}
+                        </span>
+                        {task.amount != null && (
+                          <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
+                            {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
+                          </span>
+                        )}
                       </div>
                       <div
                         style={{
