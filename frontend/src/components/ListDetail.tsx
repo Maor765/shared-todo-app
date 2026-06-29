@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
@@ -57,6 +57,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [adding, setAdding] = useState(false);
+  const pendingToggleRef = useRef<Set<string>>(new Set());
 
   const openEdit = () => {
     if (!list) return;
@@ -103,6 +104,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   };
 
   const toggleTask = async (taskId: string) => {
+    if (pendingToggleRef.current.has(taskId)) return;
     const task = list.tasks.find((task) => task.id === taskId);
     if (!task) return;
     const newDone = !task.done;
@@ -111,8 +113,10 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, done } : t)) } : prev,
       );
     patch(newDone);
+    pendingToggleRef.current.add(taskId);
     try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
     catch { patch(task.done); }
+    finally { pendingToggleRef.current.delete(taskId); }
   };
 
   const markAllDone = async () => {
@@ -165,7 +169,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     const assignee = list.members?.find((m) => m.id === task.assignee_id);
     return (
       <div onClick={() => setTaskSheet(task)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--border-subtle)', cursor: 'pointer' }}>
-        <div onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}>
+        <div onClick={(e) => e.stopPropagation()}>
           <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
