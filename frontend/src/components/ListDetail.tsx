@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react';
+﻿import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
@@ -57,8 +57,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [adding, setAdding] = useState(false);
-  const pendingToggleRef = useRef<Set<string>>(new Set());
-
   const openEdit = () => {
     if (!list) return;
     setEditName(list.name);
@@ -104,7 +102,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   };
 
   const toggleTask = async (taskId: string) => {
-    if (pendingToggleRef.current.has(taskId)) return;
     const task = list.tasks.find((task) => task.id === taskId);
     if (!task) return;
     const newDone = !task.done;
@@ -113,10 +110,8 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, done } : t)) } : prev,
       );
     patch(newDone);
-    pendingToggleRef.current.add(taskId);
     try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
     catch { patch(task.done); }
-    finally { pendingToggleRef.current.delete(taskId); }
   };
 
   const markAllDone = async () => {
