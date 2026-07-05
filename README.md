@@ -16,7 +16,7 @@ A full-stack collaborative task management app built with Node.js, Express, Post
 
 **Backend:** Node.js + Express + TypeScript + PostgreSQL + Socket.io
 **Frontend:** React 18 + TypeScript + Vite + TanStack Router + TanStack Query + Axios
-**Deploy:** Railway + Docker
+**Deploy:** Frontend → Vercel · Backend + DB → Railway
 
 ## Getting Started
 
@@ -162,14 +162,28 @@ CLAUDE.md              # Detailed architecture docs
 
 All events automatically synced across all users in the workspace.
 
-## Deployment (Railway)
+## Live URLs
 
-1. **Connect repository** to Railway
-2. **Set environment variables:**
-   - `JWT_SECRET` — Random 48+ bytes (e.g., `openssl rand -base64 48`)
-   - `FRONTEND_URL` — Your Railway frontend domain
-   - Database: Railway PostgreSQL plugin (provides `DATABASE_URL` automatically)
-3. **Deploy** — Railway auto-detects `railway.toml` and deploys both services
+- **Frontend:** https://shared-todo-app.vercel.app
+- **Backend:** https://shared-todo-backend-production.up.railway.app
+
+## Deployment
+
+### Frontend (Vercel)
+1. Connect the `frontend/` directory to a Vercel project
+2. Set environment variables:
+   - `VITE_API_URL` — Railway backend URL
+   - `VITE_GOOGLE_CLIENT_ID` — Google OAuth client ID
+3. Add `https://your-vercel-url.vercel.app` as an authorized origin in Google Cloud Console
+
+### Backend (Railway)
+1. Connect repository to Railway
+2. Set environment variables:
+   - `JWT_SECRET` — Random 48+ bytes (`openssl rand -base64 48`)
+   - `FRONTEND_URL` — Your Vercel frontend URL (for CORS + Socket.io)
+   - `GOOGLE_CLIENT_ID` — Google OAuth client ID
+   - Database: Railway PostgreSQL plugin provides `DATABASE_URL` automatically
+3. Railway auto-detects `railway.toml` and deploys the backend service
 
 ## Design System
 
