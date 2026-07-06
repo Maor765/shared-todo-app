@@ -55,6 +55,7 @@ export interface DBTask {
   due: string | null;
   notes: string;
   amount: number | null;
+  position: number;
   created_by: string;
   created_at: string;
   updated_at: string;

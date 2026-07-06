@@ -106,6 +106,24 @@ export function useListDetail(listId: string) {
     );
   });
 
+  useSocketEvent('task:reordered', ({ list_id, orderedIds }: { list_id: string; orderedIds: string[] }) => {
+    if (list_id !== listId) return;
+    queryClient.setQueryData<ListDetail>(['list', listId], (prev) => {
+      if (!prev) return prev;
+      const taskMap = new Map(prev.tasks.map((t) => [t.id, t]));
+      const reordered = orderedIds.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof prev.tasks;
+      return { ...prev, tasks: reordered };
+    });
+    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+      (prev ?? []).map((l) => {
+        if (l.id !== list_id || !l.tasks) return l;
+        const taskMap = new Map(l.tasks.map((t) => [t.id, t]));
+        const reordered = orderedIds.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof l.tasks;
+        return { ...l, tasks: reordered };
+      }),
+    );
+  });
+
   useSocketEvent('sublist:created', ({ sublist, list_id }: { sublist: DBSublist; list_id: string }) => {
     if (list_id !== listId) return;
     queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>

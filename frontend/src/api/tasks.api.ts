@@ -7,4 +7,6 @@ export const tasksAPI = {
     client.patch(`/api/lists/${listId}/tasks/${taskId}`, data),
   deleteTask: (listId: string, taskId: string) =>
     client.delete(`/api/lists/${listId}/tasks/${taskId}`),
+  reorderTasks: (listId: string, orderedIds: string[]) =>
+    client.patch(`/api/lists/${listId}/tasks/reorder`, { orderedIds }),
 };
