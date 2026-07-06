@@ -1,5 +1,14 @@
-﻿import { useState } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext, verticalListSortingStrategy, useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
 import { useSettings } from '../context/SettingsContext';
@@ -30,6 +39,8 @@ const EMOJIS = [
   "🛸","🌕","⭐","🌠","🌌","🪐","☄️","🔭","🛰️","👽","🤖","👾","🕹️","🌐",
 ];
 
+type SortOption = 'default' | 'az' | 'done_last' | 'amount';
+
 interface ListDetailProps { listId: string; onBack: () => void; }
 
 export default function ListDetail({ listId, onBack }: ListDetailProps) {
@@ -57,6 +68,35 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [quickText, setQuickText] = useState('');
+  const [quickSublist, setQuickSublist] = useState<string | null>(null);
+
+  const SORT_KEY = `sort_list_${listId}`;
+  const SORT_GLOBAL_KEY = 'sort_global';
+  const getSavedSort = (): SortOption => {
+    const perList = localStorage.getItem(SORT_KEY);
+    if (perList) return perList as SortOption;
+    const global = localStorage.getItem(SORT_GLOBAL_KEY);
+    if (global) return global as SortOption;
+    return 'default';
+  };
+  const [activeSort, setActiveSort] = useState<SortOption>(getSavedSort);
+  const [showSortSheet, setShowSortSheet] = useState(false);
+  const applySort = (tasks: DBTask[]): DBTask[] => {
+    if (activeSort === 'default') return tasks;
+    const sorted = [...tasks];
+    if (activeSort === 'az') sorted.sort((a, b) => a.text.localeCompare(b.text));
+    else if (activeSort === 'done_last') sorted.sort((a, b) => Number(a.done) - Number(b.done));
+    else if (activeSort === 'amount') sorted.sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+    return sorted;
+  };
+  const saveSort = (sort: SortOption, asGlobal = false) => {
+    setActiveSort(sort);
+    localStorage.setItem(SORT_KEY, sort);
+    if (asGlobal) localStorage.setItem(SORT_GLOBAL_KEY, sort);
+    setShowSortSheet(false);
+  };
+
   const openEdit = () => {
     if (!list) return;
     setEditName(list.name);
@@ -156,35 +196,82 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     } catch {} finally { setAdding(false); }
   };
 
-  const looseTasks = list.tasks.filter((task) => !task.sublist_id && filterTask(task));
+  const doQuickAdd = async () => {
+    if (!quickText.trim() || adding) return;
+    setAdding(true);
+    try {
+      await tasksAPI.createTask(listId, { text: quickText.trim(), sublist_id: quickSublist, notes: '' });
+      setQuickText('');
+    } catch {} finally { setAdding(false); }
+  };
 
-  const TaskRow = ({ task }: { task: DBTask }) => {
+  const looseTasks = applySort(list.tasks.filter((task) => !task.sublist_id && filterTask(task)));
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragEnd = useCallback((event: DragEndEvent, sectionTasks: DBTask[]) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = sectionTasks.findIndex((t) => t.id === active.id);
+    const newIdx = sectionTasks.findIndex((t) => t.id === over.id);
+    const reorderedSection = arrayMove(sectionTasks, oldIdx, newIdx);
+    const sectionIdSet = new Set(sectionTasks.map((t) => t.id));
+    let cursor = 0;
+    const newOrder = list.tasks.map((t) =>
+      sectionIdSet.has(t.id) ? reorderedSection[cursor++].id : t.id,
+    );
+    queryClient.setQueryData<ListDetail>(['list', listId], (prev) => {
+      if (!prev) return prev;
+      const taskMap = new Map(prev.tasks.map((t) => [t.id, t]));
+      return { ...prev, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })) };
+    });
+    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+      (prev ?? []).map((l) => {
+        if (l.id !== listId || !l.tasks) return l;
+        const taskMap = new Map(l.tasks.map((t) => [t.id, t]));
+        return { ...l, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof l.tasks };
+      }),
+    );
+    tasksAPI.reorderTasks(listId, newOrder).catch(() => {
+      queryClient.invalidateQueries({ queryKey: ['list', listId] });
+    });
+  }, [list.tasks, listId, queryClient]);
+
+  const SortableTaskRow = ({ task }: { task: DBTask }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
     const isOverdue = task.due && task.due < today && !task.done;
     const isDueSoon = task.due && task.due >= today && !task.done;
     const assignee = list.members?.find((m) => m.id === task.assignee_id);
     return (
-      <div onClick={() => setTaskSheet(task)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--border-subtle)', cursor: 'pointer' }}>
-        <div onClick={(e) => e.stopPropagation()}>
-          <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 17, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</span>
-            {task.amount != null && (
-              <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
-                {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
-              </span>
+      <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--border-subtle)' }}>
+        {activeSort === 'default' && (
+          <div {...attributes} {...listeners} style={{ color: 'var(--text-faint)', cursor: 'grab', paddingTop: 3, flexShrink: 0, touchAction: 'none' }}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/></svg>
+          </div>
+        )}
+        <div onClick={() => setTaskSheet(task)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, cursor: 'pointer', minWidth: 0 }}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 17, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</span>
+              {task.amount != null && (
+                <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
+                  {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
+                </span>
+              )}
+            </div>
+            {assignee && (
+              <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
+                <Avatar member={assignee} size={16} />
+                <span>{assignee.name.split(' ')[0]}</span>
+              </div>
             )}
           </div>
-          {(assignee) && (
-            <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2, display: 'flex', gap: 6, alignItems: 'center' }}>
-              <Avatar member={assignee} size={16} />
-              <span>{assignee.name.split(' ')[0]}</span>
-            </div>
-          )}
+          {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
+          {isDueSoon && <Badge variant="warn">{t('soon_badge')}</Badge>}
         </div>
-        {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
-        {isDueSoon && <Badge variant="warn">{t('soon_badge')}</Badge>}
       </div>
     );
   };
@@ -213,6 +300,11 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button onClick={() => setShowSortSheet(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 6, color: activeSort !== 'default' ? 'var(--primary)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+              {activeSort !== 'default' && <span style={{ position: 'absolute', top: 3, right: 3, width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)' }} />}
+            </button>
             <button onClick={() => { setShowSearch((s) => !s); setSearch(''); }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 6, color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
@@ -263,7 +355,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         onChange={setFilter}
       />
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 80px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px 130px' }}>
         {(list.tasks.some((t) => !t.done) || list.tasks.some((t) => t.done)) && (
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             {list.tasks.some((t) => !t.done) && (
@@ -283,7 +375,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           </div>
         )}
         {(list.sublists || []).map((sl) => {
-          const tasks = list.tasks.filter((task) => task.sublist_id === sl.id && filterTask(task));
+          const tasks = applySort(list.tasks.filter((task) => task.sublist_id === sl.id && filterTask(task)));
           return (
             <div key={sl.id} style={{ background: 'var(--bg-card)', borderRadius: 14, border: '0.5px solid var(--border)', marginBottom: 10, overflow: 'hidden' }}>
               <div onClick={() => setCollapsed((c) => ({ ...c, [sl.id]: !c[sl.id] }))} style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg)', borderBottom: '0.5px solid var(--border)', cursor: 'pointer' }}>
@@ -300,7 +392,13 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
                 <div style={{ padding: '0 14px' }}>
                   {tasks.length === 0
                     ? <div style={{ fontSize: 14, color: 'var(--text-disabled)', padding: '12px 0' }}>{t('no_tasks_yet')}</div>
-                    : tasks.map((task) => <TaskRow key={task.id} task={task} />)}
+                    : (
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, tasks)}>
+                        <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+                          {tasks.map((task) => <SortableTaskRow key={task.id} task={task} />)}
+                        </SortableContext>
+                      </DndContext>
+                    )}
                 </div>
               )}
             </div>
@@ -309,29 +407,50 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
 
         {looseTasks.length > 0 && (
           <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '0.5px solid var(--border)', padding: '0 14px', marginBottom: 10 }}>
-            {looseTasks.map((task) => <TaskRow key={task.id} task={task} />)}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, looseTasks)}>
+              <SortableContext items={looseTasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+                {looseTasks.map((task) => <SortableTaskRow key={task.id} task={task} />)}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
       </div>
 
-      {/* Floating action button */}
-      <button
-        onClick={() => setAddSheet(true)}
-        style={{
-          position: 'absolute', bottom: 20, right: 20,
-          width: 52, height: 52, borderRadius: '50%',
-          background: 'var(--primary)', color: '#fff',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-          zIndex: 10,
-        }}
-      >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
+      {/* Quick-add bar */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '0.5px solid var(--border)', padding: '10px 16px 14px', zIndex: 10 }}>
+        {(list.sublists || []).length > 0 && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8, overflowX: 'auto', paddingBottom: 2 }}>
+            <button onClick={() => setQuickSublist(null)}
+              style={{ flexShrink: 0, fontSize: 13, padding: '3px 10px', borderRadius: 999, border: '0.5px solid', background: !quickSublist ? 'var(--primary)' : 'var(--bg-input)', color: !quickSublist ? '#fff' : 'var(--text-dim)', borderColor: !quickSublist ? 'var(--primary)' : 'var(--border)', cursor: 'pointer' }}>
+              No sublist
+            </button>
+            {(list.sublists || []).map((sl) => (
+              <button key={sl.id} onClick={() => setQuickSublist(sl.id)}
+                style={{ flexShrink: 0, fontSize: 13, padding: '3px 10px', borderRadius: 999, border: '0.5px solid', background: quickSublist === sl.id ? 'var(--primary)' : 'var(--bg-input)', color: quickSublist === sl.id ? '#fff' : 'var(--text-dim)', borderColor: quickSublist === sl.id ? 'var(--primary)' : 'var(--border)', cursor: 'pointer' }}>
+                {sl.name}
+              </button>
+            ))}
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            value={quickText}
+            onChange={(e) => setQuickText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && doQuickAdd()}
+            placeholder="Add item..."
+            style={{ flex: 1, height: 40, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 16, color: 'var(--text)', outline: 'none' }}
+          />
+          <button onClick={() => setAddSheet(true)}
+            style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 8, background: 'var(--bg-input)', border: '0.5px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </button>
+          <button onClick={doQuickAdd} disabled={!quickText.trim() || adding}
+            style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 10, background: quickText.trim() ? 'var(--primary)' : 'var(--bg-input)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: quickText.trim() ? '#fff' : 'var(--text-faint)', opacity: adding ? 0.6 : 1, transition: 'background .15s' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+        </div>
+      </div>
 
       <Sheet open={addSheet} onClose={() => setAddSheet(false)} title={`${t('add_to')} ${list.name}`}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
@@ -422,6 +541,36 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: saving || !editName.trim() ? 0.6 : 1 }}>
           {saving ? t('saving') : t('save')}
         </button>
+      </Sheet>
+
+      <Sheet open={showSortSheet} onClose={() => setShowSortSheet(false)} title="Sort tasks">
+        {([
+          { key: 'default', label: 'Default order', sub: 'As added' },
+          { key: 'az', label: 'A → Z', sub: 'Alphabetical' },
+          { key: 'done_last', label: 'Open first', sub: 'Undone tasks on top' },
+          { key: 'amount', label: 'Amount ↓', sub: 'Highest amount first' },
+        ] as { key: SortOption; label: string; sub: string }[]).map(({ key, label, sub }) => (
+          <button key={key} onClick={() => setActiveSort(key)}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: '0.5px solid var(--border)', background: 'none', cursor: 'pointer', textAlign: 'left' }}>
+            <div>
+              <div style={{ fontSize: 16, color: activeSort === key ? 'var(--primary)' : 'var(--text)', fontWeight: activeSort === key ? 600 : 400 }}>{label}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2 }}>{sub}</div>
+            </div>
+            {activeSort === key && (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            )}
+          </button>
+        ))}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
+          <button onClick={() => saveSort(activeSort, false)}
+            style={{ padding: 12, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--border)', fontSize: 14, fontWeight: 600, color: 'var(--text)', cursor: 'pointer' }}>
+            Save for this list
+          </button>
+          <button onClick={() => saveSort(activeSort, true)}
+            style={{ padding: 12, borderRadius: 10, background: 'var(--primary)', border: 'none', fontSize: 14, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>
+            Set as default
+          </button>
+        </div>
       </Sheet>
 
       <Sheet open={showDelete} onClose={() => setShowDelete(false)} title={t('delete_list_confirm')}>
