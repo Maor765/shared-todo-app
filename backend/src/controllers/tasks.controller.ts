@@ -206,6 +206,41 @@ export async function updateTask(
   }
 }
 
+export async function reorderTasks(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { listId } = req.params;
+    const workspaceId = req.user?.workspace_id;
+    const { orderedIds } = req.body;
+
+    if (!workspaceId) throw new AppError(401, 'Unauthorized');
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      throw new AppError(400, 'orderedIds must be a non-empty array');
+    }
+
+    await query(
+      `UPDATE tasks SET position = u.pos
+       FROM (SELECT unnest($1::uuid[]) AS id, generate_series(1, $2) AS pos) AS u
+       WHERE tasks.id = u.id AND tasks.list_id = $3`,
+      [orderedIds, orderedIds.length, listId],
+    );
+
+    if (io) {
+      io.to(`workspace:${workspaceId}`).emit('task:reordered', {
+        list_id: listId,
+        orderedIds,
+      });
+    }
+
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deleteTask(
   req: Request,
   res: Response,
