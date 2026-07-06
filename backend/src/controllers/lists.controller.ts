@@ -96,8 +96,8 @@ export async function getLists(
 
     if (listIds.length > 0) {
       const tasksResult = await query(
-        `SELECT id, list_id, sublist_id, text, done, assignee_id, due, notes, created_by, created_at, updated_at
-         FROM tasks WHERE list_id = ANY($1) ORDER BY created_at DESC`,
+        `SELECT id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, position, created_by, created_at, updated_at
+         FROM tasks WHERE list_id = ANY($1) ORDER BY position ASC`,
         [listIds],
       );
       const tasksByList: Record<string, any[]> = {};
@@ -202,9 +202,9 @@ export async function getListDetail(
     );
 
     const tasksResult = await query(
-      `SELECT id, list_id, sublist_id, text, done, assignee_id, due, notes, created_by, created_at, updated_at
+      `SELECT id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, position, created_by, created_at, updated_at
        FROM tasks WHERE list_id = $1
-       ORDER BY created_at DESC`,
+       ORDER BY position ASC`,
       [listId],
     );
 

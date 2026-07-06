@@ -33,9 +33,11 @@ export async function createTask(
     }
 
     const result = await query(
-      `INSERT INTO tasks (list_id, sublist_id, text, assignee_id, due, notes, amount, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, created_by, created_at, updated_at`,
+      `INSERT INTO tasks (list_id, sublist_id, text, assignee_id, due, notes, amount, created_by, position)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
+         COALESCE((SELECT MAX(position) FROM tasks WHERE list_id = $1), 0) + 1
+       )
+       RETURNING id, list_id, sublist_id, text, done, assignee_id, due, notes, amount, position, created_by, created_at, updated_at`,
       [listId, sublist_id || null, text, assignee_id || null, due || null, notes || '', amount ?? null, userId],
     );
 
