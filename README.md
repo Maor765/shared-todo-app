@@ -185,21 +185,9 @@ All events automatically synced across all users in the workspace.
    - Database: Railway PostgreSQL plugin provides `DATABASE_URL` automatically
 3. Railway auto-detects `railway.toml` and deploys the backend service
 
-### Fixing Google SSO for a new frontend URL
+### Fixing Google SSO after a URL change
 
-When the frontend URL changes, Google SSO will silently fail. Fix it in two steps:
-
-**1. Google Cloud Console**
-- Go to [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials
-- Open your OAuth 2.0 Client ID
-- Under **Authorized JavaScript origins**, add the new URL (e.g. `https://shared-todo-maor765.vercel.app`)
-- Save — takes effect within a few minutes
-
-**2. Vercel environment variable**
-- `VITE_GOOGLE_CLIENT_ID` must be set on the Vercel project (already set)
-- After any change, redeploy so Vite bakes the value into the bundle
-
-> Current authorized origins: `https://shared-todo-maor765.vercel.app`
+See [docs/GOOGLE_SSO.md](docs/GOOGLE_SSO.md).
 
 ## Design System
 
