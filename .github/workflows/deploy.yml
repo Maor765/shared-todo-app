@@ -46,7 +46,9 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: vercel --prod --yes --cwd frontend
+        run: |
+          DEPLOY_URL=$(vercel --prod --yes --cwd frontend 2>&1 | grep -o 'https://shared-todo-[^ ]*\.vercel\.app' | head -1)
+          vercel alias "$DEPLOY_URL" shared-todo-maor765.vercel.app
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: team_KFtpDtY7AWW1JbEuxiQ28OAQ
