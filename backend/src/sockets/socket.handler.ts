@@ -5,9 +5,10 @@ import { JWTPayload, MemberStatusPayload } from '../types.js';
 import { query } from '../db.js';
 
 export function initSocket(server: HTTPServer): Server {
+  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:4001').split(',').map((s) => s.trim());
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:4001',
+      origin: (origin, cb) => cb(null, !origin || allowedOrigins.some((o) => origin === o || origin.endsWith('.vercel.app'))),
       credentials: true,
     },
   });
