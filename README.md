@@ -164,7 +164,7 @@ All events automatically synced across all users in the workspace.
 
 ## Live URLs
 
-- **Frontend:** https://shared-todo-app.vercel.app
+- **Frontend:** https://shared-todo-maor765.vercel.app
 - **Backend:** https://shared-todo-backend-production.up.railway.app
 
 ## Deployment
@@ -174,7 +174,7 @@ All events automatically synced across all users in the workspace.
 2. Set environment variables:
    - `VITE_API_URL` — Railway backend URL
    - `VITE_GOOGLE_CLIENT_ID` — Google OAuth client ID
-3. Add `https://your-vercel-url.vercel.app` as an authorized origin in Google Cloud Console
+3. Push to `main` — GitHub Actions typechecks and auto-deploys to Vercel
 
 ### Backend (Railway)
 1. Connect repository to Railway
@@ -184,6 +184,22 @@ All events automatically synced across all users in the workspace.
    - `GOOGLE_CLIENT_ID` — Google OAuth client ID
    - Database: Railway PostgreSQL plugin provides `DATABASE_URL` automatically
 3. Railway auto-detects `railway.toml` and deploys the backend service
+
+### Fixing Google SSO for a new frontend URL
+
+When the frontend URL changes, Google SSO will silently fail. Fix it in two steps:
+
+**1. Google Cloud Console**
+- Go to [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials
+- Open your OAuth 2.0 Client ID
+- Under **Authorized JavaScript origins**, add the new URL (e.g. `https://shared-todo-maor765.vercel.app`)
+- Save — takes effect within a few minutes
+
+**2. Vercel environment variable**
+- `VITE_GOOGLE_CLIENT_ID` must be set on the Vercel project (already set)
+- After any change, redeploy so Vite bakes the value into the bundle
+
+> Current authorized origins: `https://shared-todo-maor765.vercel.app`
 
 ## Design System
 
