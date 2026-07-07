@@ -24,7 +24,8 @@ const server = createServer(app);
 const port = parseInt(process.env.PORT || '4000', 10);
 
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:4001' }));
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:4001').split(',').map((s) => s.trim());
+app.use(cors({ origin: (origin, cb) => cb(null, !origin || allowedOrigins.some((o) => origin === o || origin.endsWith('.vercel.app'))) }));
 app.use(express.json());
 
 const io = initSocket(server);
