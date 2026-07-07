@@ -97,6 +97,36 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     setShowSortSheet(false);
   };
 
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragEnd = useCallback((event: DragEndEvent, sectionTasks: DBTask[]) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = sectionTasks.findIndex((t) => t.id === active.id);
+    const newIdx = sectionTasks.findIndex((t) => t.id === over.id);
+    const reorderedSection = arrayMove(sectionTasks, oldIdx, newIdx);
+    const sectionIdSet = new Set(sectionTasks.map((t) => t.id));
+    let cursor = 0;
+    const newOrder = (list?.tasks ?? []).map((t) =>
+      sectionIdSet.has(t.id) ? reorderedSection[cursor++].id : t.id,
+    );
+    queryClient.setQueryData<ListDetail>(['list', listId], (prev) => {
+      if (!prev) return prev;
+      const taskMap = new Map(prev.tasks.map((t) => [t.id, t]));
+      return { ...prev, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })) };
+    });
+    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
+      (prev ?? []).map((l) => {
+        if (l.id !== listId || !l.tasks) return l;
+        const taskMap = new Map(l.tasks.map((t) => [t.id, t]));
+        return { ...l, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof l.tasks };
+      }),
+    );
+    tasksAPI.reorderTasks(listId, newOrder).catch(() => {
+      queryClient.invalidateQueries({ queryKey: ['list', listId] });
+    });
+  }, [list?.tasks, listId, queryClient]);
+
   const openEdit = () => {
     if (!list) return;
     setEditName(list.name);
@@ -206,36 +236,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   };
 
   const looseTasks = applySort(list.tasks.filter((task) => !task.sublist_id && filterTask(task)));
-
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
-
-  const handleDragEnd = useCallback((event: DragEndEvent, sectionTasks: DBTask[]) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIdx = sectionTasks.findIndex((t) => t.id === active.id);
-    const newIdx = sectionTasks.findIndex((t) => t.id === over.id);
-    const reorderedSection = arrayMove(sectionTasks, oldIdx, newIdx);
-    const sectionIdSet = new Set(sectionTasks.map((t) => t.id));
-    let cursor = 0;
-    const newOrder = list.tasks.map((t) =>
-      sectionIdSet.has(t.id) ? reorderedSection[cursor++].id : t.id,
-    );
-    queryClient.setQueryData<ListDetail>(['list', listId], (prev) => {
-      if (!prev) return prev;
-      const taskMap = new Map(prev.tasks.map((t) => [t.id, t]));
-      return { ...prev, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })) };
-    });
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-      (prev ?? []).map((l) => {
-        if (l.id !== listId || !l.tasks) return l;
-        const taskMap = new Map(l.tasks.map((t) => [t.id, t]));
-        return { ...l, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof l.tasks };
-      }),
-    );
-    tasksAPI.reorderTasks(listId, newOrder).catch(() => {
-      queryClient.invalidateQueries({ queryKey: ['list', listId] });
-    });
-  }, [list.tasks, listId, queryClient]);
 
   const SortableTaskRow = ({ task }: { task: DBTask }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
