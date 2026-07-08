@@ -30,9 +30,9 @@
   - Team (members list, invite member)
 
 ### Infrastructure & Config
-- ✅ **Docker:** docker-compose.yml (postgres + backend + frontend)
+- ✅ **Docker:** docker-compose.yml (postgres + backend + frontend) — local dev
 - ✅ **Dockerfiles:** backend/Dockerfile + frontend/Dockerfile
-- ✅ **Railway:** railway.toml (2-service deploy config)
+- ✅ **Render:** render.yaml (backend deploy config)
 - ✅ **.env:** Example environment variables
 - ✅ **.gitignore:** Standard Node.js ignore patterns
 
@@ -94,7 +94,7 @@ docker-compose up
 | Auth | JWT (jsonwebtoken) + bcryptjs |
 | Socket Server | Socket.io |
 | Security | Helmet, CORS, JWT middleware |
-| Deploy | Railway + Docker |
+| Deploy | Render (backend) + Vercel (frontend) + Neon (DB) |
 
 ---
 
@@ -136,7 +136,7 @@ shared-todo-app/
 │   └── tsconfig.json
 │
 ├── docker-compose.yml         # Local dev: 3 services
-├── railway.toml              # Railway deploy config
+├── render.yaml               # Render deploy config (backend)
 ├── CLAUDE.md                 # Architecture documentation
 ├── README.md                 # Setup & feature guide
 ├── BUILD_SUMMARY.md          # This file
@@ -188,22 +188,19 @@ These are enhancement opportunities, not blockers.
 
 ---
 
-## 🚢 Deploy to Railway
+## 🚢 Production Deployment
 
-1. **Connect GitHub repo:**
-   - Go to railway.app
-   - Create project from GitHub repo
-   - Railway auto-detects `railway.toml`
+| Service | Platform | URL |
+|---------|----------|-----|
+| Database | Neon | postgresql serverless |
+| Backend | Render | https://shared-todo-backend.onrender.com |
+| Frontend | Vercel | https://shared-todo-maor765.vercel.app |
 
-2. **Set secrets:**
-   - `JWT_SECRET` = `openssl rand -base64 48`
-   - Database plugin auto-provides `DATABASE_URL`
-   - `FRONTEND_URL` = Your Railway frontend domain
+**Backend (Render):** Push to `main` → auto-deploys via `render.yaml`. Set `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL`, `GOOGLE_CLIENT_ID` in Render dashboard.
 
-3. **Deploy:**
-   - Both services (backend + frontend) deploy automatically
-   - Frontend served on Railway domain
-   - Backend APIs available to frontend
+**Frontend (Vercel):** Push to `main` → GitHub Actions deploys automatically. Set `VITE_API_URL` and `VITE_GOOGLE_CLIENT_ID` in Vercel dashboard (baked at build time).
+
+**Note:** Render free tier spins down after 15 min inactivity — first request after sleep takes ~30s to wake up.
 
 ---
 
