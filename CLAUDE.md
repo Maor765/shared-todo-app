@@ -17,7 +17,7 @@ The original design (inline styles, 390px phone shell, component patterns) lives
 | Frontend | React 18 + Vite + TypeScript |
 | Routing | react-router-dom v6 |
 | HTTP client | Axios |
-| Deploy | Railway (2 services + PostgreSQL plugin) |
+| Deploy | Render (backend) + Vercel (frontend) + Neon (DB) |
 | Local dev | docker-compose |
 
 ---
@@ -49,7 +49,7 @@ All inline styles — no Tailwind, no CSS-in-JS library.
 shared-todo-app/
 ├── CLAUDE.md
 ├── README.md
-├── railway.toml
+├── render.yaml
 ├── docker-compose.yml
 ├── .env.example
 │
@@ -354,20 +354,22 @@ Axios 401 interceptor calls `logout()` → clears localStorage → `user` become
 
 ## Environment Variables
 
-### Backend (`.env` / Railway)
+### Backend (Render dashboard env vars)
 ```
-DATABASE_URL=postgres://user:pass@host:5432/dbname   # Railway provides automatically
-JWT_SECRET=<48+ random bytes>                         # Use: openssl rand -base64 48
-PORT=3001                                             # Railway sets automatically
+DATABASE_URL=postgresql://...@...neon.tech/neondb?sslmode=require   # Neon connection string
+JWT_SECRET=<48+ random bytes>                                         # Use: openssl rand -base64 48
+PORT=3001                                                             # Render sets automatically
 NODE_ENV=production
-FRONTEND_URL=https://your-frontend.railway.app        # For CORS + Socket.io
+FRONTEND_URL=https://shared-todo-maor765.vercel.app                  # For CORS + Socket.io
+GOOGLE_CLIENT_ID=<from Google Cloud Console>
 ```
 
-### Frontend (`.env` / Railway build-time)
+### Frontend (Vercel dashboard env vars — baked at build time)
 ```
-VITE_API_URL=https://your-backend.railway.app
+VITE_API_URL=https://shared-todo-backend.onrender.com
+VITE_GOOGLE_CLIENT_ID=<from Google Cloud Console>
 ```
-Note: Vite bakes `VITE_*` vars at build time. Set in Railway dashboard before deploy.
+Note: Vite bakes `VITE_*` vars at build time. Set in Vercel dashboard before triggering a deploy.
 
 ---
 
@@ -417,34 +419,19 @@ input, select, textarea, button { font-family: inherit; }
 
 ---
 
-## Railway Deployment
+## Production Deployment
 
-Two Railway services in one repo. PostgreSQL plugin attached to backend.
+| Layer | Platform | URL |
+|-------|----------|-----|
+| Database | Neon (serverless PostgreSQL) | neon.tech dashboard |
+| Backend | Render (Node web service) | https://shared-todo-backend.onrender.com |
+| Frontend | Vercel | https://shared-todo-maor765.vercel.app |
 
-```toml
-# railway.toml
+**Backend:** push to `main` → Render auto-deploys via `render.yaml`. Build command uses `npm install --include=dev` to ensure TypeScript and `@types/*` are available during the build even with `NODE_ENV=production`.
 
-[[services]]
-name = "backend"
-rootDirectory = "backend"
+**Frontend:** push to `main` → GitHub Actions deploys to Vercel automatically.
 
-[services.build]
-buildCommand = "npm install && npm run build"
-
-[services.deploy]
-startCommand = "npm run start"
-healthcheckPath = "/api/health"
-
-[[services]]
-name = "frontend"
-rootDirectory = "frontend"
-
-[services.build]
-buildCommand = "npm install && npm run build"
-
-[services.deploy]
-startCommand = "npx serve -s dist -l $PORT"
-```
+**Render free tier note:** service spins down after 15 min of inactivity; first request after sleep takes ~30s.
 
 ---
 
@@ -504,7 +491,7 @@ Backend: `tsx watch` for hot reload. Frontend: `vite --host`.
 30. `Dashboard.tsx`, `Lists.tsx`, `ListDetail.tsx`, `TaskDetailSheet.tsx`, `Notifications.tsx`, `Team.tsx`
 
 ### Phase 8 — Deploy Config
-31. `railway.toml`
+31. `render.yaml`
 32. `.env.example`
 33. `backend/Dockerfile` + `frontend/Dockerfile`
 34. `README.md`
@@ -513,11 +500,11 @@ Backend: `tsx watch` for hot reload. Frontend: `vite --host`.
 
 ## Known Gotchas
 
-1. **Use `bcryptjs` not `bcrypt`** — Railway Nixpacks fails on native bcrypt compilation
+1. **Use `bcryptjs` not `bcrypt`** — native bcrypt requires build tooling that isn't available in all deploy environments
 2. **Vite WebSocket proxy** — must set `ws: true` on the `/socket.io` proxy or Socket.io won't upgrade
 3. **PostgreSQL `DATE` columns** — `pg` returns JavaScript `Date` objects, not strings; serialize with `.toISOString().slice(0, 10)` before sending to frontend
 4. **Circular import: `io` instance** — inject `io` into `notifications.service` via `init(io)` called in `index.ts`, never import `socket.handler` from a controller
-5. **VITE_* vars baked at build time** — set them in Railway as build-time variables before triggering a deploy
+5. **VITE_* vars baked at build time** — set them in Vercel dashboard before triggering a deploy; they are not available at runtime
 6. **Socket.io CORS** — must match the exact frontend origin including `https://` protocol; wildcard `*` breaks credentials
 7. **Notification dedup for due-soon** — before creating a `due` notification, check `notifications` table for an existing one from today for the same task
 8. **Task toggle notification guard** — skip `onTaskCompleted` if the actor is the sole list member (avoids self-notifying on private lists)
