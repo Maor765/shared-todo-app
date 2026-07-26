@@ -109,8 +109,8 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
           {saving ? t('saving') : t('save')}
         </button>
         <button onClick={handleDelete}
-          style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--danger-bg)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" strokeLinecap="round">
+          style={{ width: 48, height: 48, borderRadius: 10, background: 'var(--danger-bg)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" strokeLinecap="round">
             <path d="M3 6h18M19 6l-1 14H6L5 6M9 6V4h6v2M10 11v6M14 11v6" />
           </svg>
         </button>
