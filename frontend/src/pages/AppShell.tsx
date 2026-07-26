@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 import { NavBar } from '../components/ui/NavBar';
+import { ToastStack } from '../components/ui/ToastStack';
 import Dashboard from '../components/Dashboard';
 import Lists from '../components/Lists';
 import ListDetail from '../components/ListDetail';
@@ -80,6 +81,7 @@ export default function AppShell() {
         tab={detailListId ? 'lists' : tab}
         setTab={(t) => { setDetailListId(null); setTab(t); }}
       />
+      <ToastStack />
     </div>
   );
 }
