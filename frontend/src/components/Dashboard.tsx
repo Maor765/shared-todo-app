@@ -1,9 +1,9 @@
 ﻿import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useLists } from '../hooks/useLists';
+import { useTaskMutations } from '../hooks/useOfflineMutations';
 import { useSettings } from '../context/SettingsContext';
-import { DBTask, ListWithMembers } from '../types';
+import { DBTask } from '../types';
 import { TopBar } from './ui/TopBar';
 import { FilterChips } from './ui/FilterChips';
 import { Avatar } from './ui/Avatar';
@@ -11,13 +11,12 @@ import { Badge } from './ui/Badge';
 import { CheckCircle } from './ui/CheckCircle';
 import { IconBtn } from './ui/IconBtn';
 import { Sheet } from './ui/Sheet';
-import { tasksAPI } from '../api/tasks.api';
 import TaskDetailSheet from './TaskDetailSheet';
 
 export default function Dashboard() {
   const auth = useAuth();
-  const queryClient = useQueryClient();
   const { lists, isLoading } = useLists();
+  const { toggleTask, createTask } = useTaskMutations();
   const { t } = useSettings();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
@@ -25,7 +24,6 @@ export default function Dashboard() {
   const [taskSheet, setTaskSheet] = useState<DBTask | null>(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedListId, setSelectedListId] = useState('');
-  const [creating, setCreating] = useState(false);
 
   const allTasks = lists.flatMap((l) => l.tasks?.map((task) => ({ ...task, list: l })) || []);
   const today = new Date().toISOString().slice(0, 10);
@@ -46,33 +44,12 @@ export default function Dashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t('good_morning') : hour < 18 ? t('good_afternoon') : t('good_evening');
 
-  const toggleTask = async (taskId: string, listId: string) => {
-    const task = allTasks.find((t) => t.id === taskId);
-    if (!task) return;
-    const newDone = !task.done;
-    const patch = (done: boolean) =>
-      queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-        (prev ?? []).map((l) =>
-          l.id === listId
-            ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === taskId ? { ...t, done } : t)) }
-            : l,
-        ),
-      );
-    patch(newDone);
-    try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
-    catch { patch(task.done); }
-  };
-
-  const handleCreateTask = async () => {
+  const handleCreateTask = () => {
     if (!selectedListId || !search.trim()) return;
-    setCreating(true);
-    try {
-      await tasksAPI.createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
-      setSearch('');
-      setShowCreateTask(false);
-      setSelectedListId('');
-    } catch {}
-    finally { setCreating(false); }
+    createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
+    setSearch('');
+    setShowCreateTask(false);
+    setSelectedListId('');
   };
 
   return (
@@ -179,8 +156,8 @@ export default function Dashboard() {
                 onClick={() => setTaskSheet(task)}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8, cursor: 'pointer' }}
               >
-                <div onClick={(e) => { e.stopPropagation(); toggleTask(task.id, task.list_id); }}>
-                  <CheckCircle done={task.done} onToggle={() => toggleTask(task.id, task.list_id)} />
+                <div onClick={(e) => { e.stopPropagation(); toggleTask(task.list_id, task.id, task.done); }}>
+                  <CheckCircle done={task.done} onToggle={() => toggleTask(task.list_id, task.id, task.done)} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -233,13 +210,13 @@ export default function Dashboard() {
         </div>
         <button
           onClick={handleCreateTask}
-          disabled={!selectedListId || creating}
+          disabled={!selectedListId}
           style={{
             width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
-            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId ? 0.6 : 1
           }}
         >
-          {creating ? '...' : t('add_task')}
+          {t('add_task')}
         </button>
       </Sheet>
     </div>
