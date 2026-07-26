@@ -1,16 +1,14 @@
 ﻿import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLists } from "../hooks/useLists";
+import { useTaskMutations, useListMutations, isTempId } from "../hooks/useOfflineMutations";
 import { useSettings } from "../context/SettingsContext";
-import { ListWithMembers, ListDetail, DBTask } from "../types";
+import { ListWithMembers, DBTask } from "../types";
 import { TopBar } from "./ui/TopBar";
 import { IconBtn } from "./ui/IconBtn";
 import { Badge } from "./ui/Badge";
 import { ProgressBar } from "./ui/ProgressBar";
 import { Avatar } from "./ui/Avatar";
 import { Sheet } from "./ui/Sheet";
-import { listsAPI } from "../api/lists.api";
-import { tasksAPI } from "../api/tasks.api";
 import React from "react";
 
 const EMOJIS = [
@@ -35,7 +33,8 @@ interface ListsProps {
 export default function Lists({ onSelectList }: ListsProps) {
   const { lists } = useLists();
   const { t } = useSettings();
-  const queryClient = useQueryClient();
+  const { toggleTask: toggleTaskMutation, createTask } = useTaskMutations();
+  const { createList: createListMutation, updateList, deleteList: deleteListMutation } = useListMutations();
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmoji, setNewEmoji] = useState("📋");
@@ -45,14 +44,11 @@ export default function Lists({ onSelectList }: ListsProps) {
   const [menuListId, setMenuListId] = useState<string | null>(null);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedListId, setSelectedListId] = useState('');
-  const [creating, setCreating] = useState(false);
   const [editList, setEditList] = useState<ListWithMembers | null>(null);
   const [editName, setEditName] = useState("");
   const [editEmoji, setEditEmoji] = useState("📋");
   const [editShared, setEditShared] = useState(true);
   const [deleteList, setDeleteList] = useState<ListWithMembers | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const openEdit = (list: ListWithMembers) => {
     setEditList(list);
@@ -62,70 +58,40 @@ export default function Lists({ onSelectList }: ListsProps) {
     setMenuListId(null);
   };
 
-  const saveEdit = async () => {
+  const saveEdit = () => {
     if (!editList || !editName.trim()) return;
-    setSaving(true);
-    try {
-      await listsAPI.updateList(editList.id, { name: editName.trim(), emoji: editEmoji, shared: editShared });
-      queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
-        (prev ?? []).map((l) =>
-          l.id === editList.id ? { ...l, name: editName.trim(), emoji: editEmoji, shared: editShared } : l,
-        ),
-      );
-      setEditList(null);
-    } catch {} finally { setSaving(false); }
+    updateList(editList.id, { name: editName.trim(), emoji: editEmoji, shared: editShared });
+    setEditList(null);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (!deleteList) return;
-    setDeleting(true);
-    try {
-      await listsAPI.deleteList(deleteList.id);
-      setDeleteList(null);
-    } catch {} finally { setDeleting(false); }
+    deleteListMutation(deleteList.id);
+    setDeleteList(null);
   };
 
   const shared = lists.filter((l) => l.shared);
   const priv = lists.filter((l) => !l.shared);
 
-  const createList = async () => {
+  const createList = () => {
     if (!newName.trim()) return;
-    try {
-      await listsAPI.createList(newName.trim(), newEmoji, newShared);
-      setNewName("");
-      setNewEmoji("📋");
-      setNewShared(true);
-      setShowCreate(false);
-    } catch {}
+    createListMutation(newName.trim(), newEmoji, newShared);
+    setNewName("");
+    setNewEmoji("📋");
+    setNewShared(true);
+    setShowCreate(false);
   };
 
-  const toggleTask = async (task: DBTask, listId: string) => {
-    const newDone = !task.done;
-    const patchLists = (done: boolean) => {
-      queryClient.setQueryData<ListWithMembers[]>(["lists"], (prev) =>
-        (prev ?? []).map((l) =>
-          l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => (t.id === task.id ? { ...t, done } : t)) } : l,
-        ),
-      );
-      queryClient.setQueryData<ListDetail>(["list", listId], (prev) =>
-        prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === task.id ? { ...t, done } : t)) } : prev,
-      );
-    };
-    patchLists(newDone);
-    try { await tasksAPI.updateTask(listId, task.id, { done: newDone }); }
-    catch { patchLists(task.done); }
+  const toggleTask = (task: DBTask, listId: string) => {
+    toggleTaskMutation(listId, task.id, task.done);
   };
 
-  const handleCreateTask = async () => {
+  const handleCreateTask = () => {
     if (!selectedListId || !search.trim()) return;
-    setCreating(true);
-    try {
-      await tasksAPI.createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
-      setSearch('');
-      setShowCreateTask(false);
-      setSelectedListId('');
-    } catch {}
-    finally { setCreating(false); }
+    createTask(selectedListId, { text: search.trim(), sublist_id: null, assignee_id: null, due: null, notes: '' });
+    setSearch('');
+    setShowCreateTask(false);
+    setSelectedListId('');
   };
 
   const taskResults: Array<{ task: DBTask; list: ListWithMembers }> = search
@@ -621,17 +587,17 @@ export default function Lists({ onSelectList }: ListsProps) {
             <div style={{ position: "absolute", width: 18, height: 18, borderRadius: "50%", background: "#fff", top: 2, left: editShared ? 20 : 2, transition: "left .2s" }} />
           </div>
         </div>
-        <button onClick={saveEdit} disabled={saving || !editName.trim()}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--primary)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", opacity: saving || !editName.trim() ? 0.6 : 1 }}>
-          {saving ? t("saving") : t("save")}
+        <button onClick={saveEdit} disabled={!editName.trim()}
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--primary)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", opacity: !editName.trim() ? 0.6 : 1 }}>
+          {t("save")}
         </button>
       </Sheet>
 
       <Sheet open={!!deleteList} onClose={() => setDeleteList(null)} title={t("delete_list_confirm")}>
         <p style={{ fontSize: 16, color: "var(--text-muted)", marginBottom: 24, lineHeight: 1.6 }}>{t("delete_list_sub")}</p>
-        <button onClick={confirmDelete} disabled={deleting}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--danger)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", marginBottom: 10, opacity: deleting ? 0.6 : 1 }}>
-          {deleting ? "..." : t("delete_list")}
+        <button onClick={confirmDelete}
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--danger)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", marginBottom: 10 }}>
+          {t("delete_list")}
         </button>
         <button onClick={() => setDeleteList(null)}
           style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--bg)", color: "var(--text-muted)", border: "0.5px solid var(--border)", fontSize: 17, cursor: "pointer" }}>
@@ -789,13 +755,13 @@ export default function Lists({ onSelectList }: ListsProps) {
         </div>
         <button
           onClick={handleCreateTask}
-          disabled={!selectedListId || creating}
+          disabled={!selectedListId}
           style={{
             width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
-            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId ? 0.6 : 1
           }}
         >
-          {creating ? '...' : t('add_task')}
+          {t('add_task')}
         </button>
       </Sheet>
     </div>
