@@ -332,8 +332,8 @@ export default function Lists({ onSelectList }: ListsProps) {
           }}
         >
           <svg
-            width="15"
-            height="15"
+            width="19"
+            height="19"
             viewBox="0 0 24 24"
             fill="none"
             stroke="var(--text-faint)"
@@ -356,7 +356,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               flex: 1,
             }}
           />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 21, padding: 2 }}>×</button>}
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 26, padding: 2 }}>×</button>}
         </div>
       )}
 

@@ -95,13 +95,13 @@ export default function Dashboard() {
 
       {showSearch && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg)', borderRadius: 10, border: '0.5px solid var(--border)', padding: '0 12px', height: 38, margin: '0 16px 8px' }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2" strokeLinecap="round">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2" strokeLinecap="round">
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
           </svg>
           <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder={t('search_ph')}
             style={{ border: 'none', background: 'none', fontSize: 18, color: 'var(--text)', outline: 'none', flex: 1 }} />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 21, padding: 2 }}>×</button>}
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 26, padding: 2 }}>×</button>}
         </div>
       )}
       <FilterChips

@@ -50,7 +50,7 @@ const en: T = {
   delete_list_confirm: 'Delete this list?', delete_list_sub: 'This will permanently delete all tasks in this list.',
   // ListDetail
   back_lists: 'Lists', no_tasks_yet: 'No tasks yet',
-  add_task_sublist: 'Add sublist or task...', add_to: 'Add to',
+  add_task_sublist: 'Add sublist or task...', add_to: 'Add to', add_item_ph: 'Add item...',
   type_task: 'Task', type_sublist: 'Sublist',
   single_todo: 'A single to-do', group_tasks: 'A group of tasks',
   task_name: 'Task name', sublist_name: 'Sublist name',
@@ -122,7 +122,7 @@ const he: T = {
   edit_list: 'ערוך רשימה', delete_list: 'מחק רשימה', mark_all_done: 'סמן הכל כבוצע', unmark_all_done: 'בטל סימון הכל',
   delete_list_confirm: 'למחוק את הרשימה?', delete_list_sub: 'פעולה זו תמחק לצמיתות את כל המשימות ברשימה.',
   back_lists: 'רשימות', no_tasks_yet: 'אין משימות עדיין',
-  add_task_sublist: '...הוסף תת-רשימה או משימה', add_to: 'הוסף ל',
+  add_task_sublist: '...הוסף תת-רשימה או משימה', add_to: 'הוסף ל', add_item_ph: '...הוסף פריט',
   type_task: 'משימה', type_sublist: 'תת-רשימה',
   single_todo: 'מטלה בודדת', group_tasks: 'קבוצת משימות',
   task_name: 'שם המשימה', sublist_name: 'שם תת-הרשימה',

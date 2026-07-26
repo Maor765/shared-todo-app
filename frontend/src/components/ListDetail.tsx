@@ -341,11 +341,11 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
 
       {showSearch && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg)', borderRadius: 10, border: '0.5px solid var(--border)', padding: '0 12px', height: 38, margin: '8px 16px 0' }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2" strokeLinecap="round"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2" strokeLinecap="round"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
           <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder={t('search_ph')}
             style={{ border: 'none', background: 'none', fontSize: 16, color: 'var(--text)', outline: 'none', flex: 1 }} />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 21, padding: 2 }}>×</button>}
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 26, padding: 2 }}>×</button>}
         </div>
       )}
       <FilterChips
@@ -438,7 +438,7 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
             value={quickText}
             onChange={(e) => setQuickText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && doQuickAdd()}
-            placeholder="Add item..."
+            placeholder={t('add_item_ph')}
             style={{ flex: 1, height: 40, borderRadius: 10, background: 'var(--bg-input)', border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 17, color: 'var(--text)', outline: 'none' }}
           />
           <button onClick={() => setAddSheet(true)}
