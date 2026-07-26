@@ -11,6 +11,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useAuth } from '../hooks/useAuth';
 import { useListDetail } from '../hooks/useLists';
+import { useTaskMutations, useListMutations, useSublistMutations, isTempId } from '../hooks/useOfflineMutations';
 import { useSettings } from '../context/SettingsContext';
 import { DBTask, ListDetail, ListWithMembers } from '../types';
 import { TopBar } from './ui/TopBar';
@@ -19,9 +20,6 @@ import { Avatar } from './ui/Avatar';
 import { Badge } from './ui/Badge';
 import { CheckCircle } from './ui/CheckCircle';
 import { Sheet } from './ui/Sheet';
-import { listsAPI } from '../api/lists.api';
-import { tasksAPI } from '../api/tasks.api';
-import { sublistsAPI } from '../api/sublists.api';
 import TaskDetailSheet from './TaskDetailSheet';
 
 const EMOJIS = [
@@ -48,6 +46,9 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const { list } = useListDetail(listId);
   const { t } = useSettings();
   const queryClient = useQueryClient();
+  const { toggleTask: toggleTaskMutation, createTask, reorderTasks } = useTaskMutations();
+  const { updateList, deleteList: deleteListMutation } = useListMutations();
+  const { createSublist } = useSublistMutations();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -65,9 +66,6 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const [editEmoji, setEditEmoji] = useState('📋');
   const [editShared, setEditShared] = useState(true);
   const [showDelete, setShowDelete] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [adding, setAdding] = useState(false);
   const [quickText, setQuickText] = useState('');
   const [quickSublist, setQuickSublist] = useState<string | null>(null);
 
@@ -122,10 +120,8 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
         return { ...l, tasks: newOrder.map((id, i) => ({ ...taskMap.get(id)!, position: i + 1 })).filter(Boolean) as typeof l.tasks };
       }),
     );
-    tasksAPI.reorderTasks(listId, newOrder).catch(() => {
-      queryClient.invalidateQueries({ queryKey: ['list', listId] });
-    });
-  }, [list?.tasks, listId, queryClient]);
+    reorderTasks(listId, newOrder);
+  }, [list?.tasks, listId, queryClient, reorderTasks]);
 
   const openEdit = () => {
     if (!list) return;
@@ -136,27 +132,15 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     setShowEdit(true);
   };
 
-  const saveEdit = async () => {
+  const saveEdit = () => {
     if (!list || !editName.trim()) return;
-    setSaving(true);
-    try {
-      await listsAPI.updateList(listId, { name: editName.trim(), emoji: editEmoji, shared: editShared });
-      queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-        (prev ?? []).map((l) => l.id === listId ? { ...l, name: editName.trim(), emoji: editEmoji, shared: editShared } : l),
-      );
-      queryClient.setQueryData(['list', listId], (prev: any) =>
-        prev ? { ...prev, name: editName.trim(), emoji: editEmoji, shared: editShared } : prev,
-      );
-      setShowEdit(false);
-    } catch {} finally { setSaving(false); }
+    updateList(listId, { name: editName.trim(), emoji: editEmoji, shared: editShared });
+    setShowEdit(false);
   };
 
-  const confirmDelete = async () => {
-    setDeleting(true);
-    try {
-      await listsAPI.deleteList(listId);
-      onBack();
-    } catch {} finally { setDeleting(false); }
+  const confirmDelete = () => {
+    deleteListMutation(listId);
+    onBack();
   };
 
   if (!list) return <div style={{ padding: 20, color: 'var(--text-muted)' }}>{t('loading')}</div>;
@@ -171,68 +155,37 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
     return true;
   };
 
-  const toggleTask = async (taskId: string) => {
+  const toggleTask = (taskId: string) => {
     const task = list.tasks.find((task) => task.id === taskId);
     if (!task) return;
-    const newDone = !task.done;
-    const patch = (done: boolean) =>
-      queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
-        prev ? { ...prev, tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, done } : t)) } : prev,
-      );
-    patch(newDone);
-    try { await tasksAPI.updateTask(listId, taskId, { done: newDone }); }
-    catch { patch(task.done); }
+    toggleTaskMutation(listId, taskId, task.done);
   };
 
-  const markAllDone = async () => {
+  const markAllDone = () => {
     setShowMenu(false);
     const undone = list.tasks.filter((t) => !t.done);
-    if (!undone.length) return;
-    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
-      prev ? { ...prev, tasks: prev.tasks.map((t) => ({ ...t, done: true })) } : prev,
-    );
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-      (prev ?? []).map((l) =>
-        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => ({ ...t, done: true })) } : l,
-      ),
-    );
-    await Promise.allSettled(undone.map((t) => tasksAPI.updateTask(listId, t.id, { done: true })));
+    undone.forEach((t) => toggleTaskMutation(listId, t.id, false));
   };
 
-  const unmarkAllDone = async () => {
+  const unmarkAllDone = () => {
     const done = list.tasks.filter((t) => t.done);
-    if (!done.length) return;
-    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
-      prev ? { ...prev, tasks: prev.tasks.map((t) => ({ ...t, done: false })) } : prev,
-    );
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-      (prev ?? []).map((l) =>
-        l.id === listId ? { ...l, tasks: (l.tasks || []).map((t) => ({ ...t, done: false })) } : l,
-      ),
-    );
-    await Promise.allSettled(done.map((t) => tasksAPI.updateTask(listId, t.id, { done: false })));
+    done.forEach((t) => toggleTaskMutation(listId, t.id, true));
   };
 
-  const doAdd = async () => {
-    if (!addName.trim() || adding) return;
-    setAdding(true);
-    try {
-      if (addType === 'sublist') {
-        await sublistsAPI.createSublist(listId, addName.trim());
-      } else {
-        await tasksAPI.createTask(listId, { text: addName.trim(), sublist_id: addSublist, assignee_id: addAssignee, due: addDue || null, notes: '' });
-      }
-      setAddName(''); setAddSublist(null); setAddAssignee(null); setAddDue(''); setAddSheet(false);
-    } catch {} finally { setAdding(false); }
+  const doAdd = () => {
+    if (!addName.trim()) return;
+    if (addType === 'sublist') {
+      createSublist(listId, addName.trim());
+    } else {
+      createTask(listId, { text: addName.trim(), sublist_id: addSublist, assignee_id: addAssignee, due: addDue || null, notes: '' });
+    }
+    setAddName(''); setAddSublist(null); setAddAssignee(null); setAddDue(''); setAddSheet(false);
   };
 
-  const doQuickAdd = async () => {
-    if (!quickText.trim() || adding) return;
-    setAdding(true);
-    try {
-      await tasksAPI.createTask(listId, { text: quickText.trim(), sublist_id: quickSublist, notes: '' });
-      setQuickText('');
-    } catch {} finally { setAdding(false); }
+  const doQuickAdd = () => {
+    if (!quickText.trim()) return;
+    createTask(listId, { text: quickText.trim(), sublist_id: quickSublist, notes: '' });
+    setQuickText('');
   };
 
   const looseTasks = applySort(list.tasks.filter((task) => !task.sublist_id && filterTask(task)));
@@ -445,8 +398,8 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
             style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 8, background: 'var(--bg-input)', border: '0.5px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </button>
-          <button onClick={doQuickAdd} disabled={!quickText.trim() || adding}
-            style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 10, background: quickText.trim() ? 'var(--primary)' : 'var(--bg-input)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: quickText.trim() ? '#fff' : 'var(--text-faint)', opacity: adding ? 0.6 : 1, transition: 'background .15s' }}>
+          <button onClick={doQuickAdd} disabled={!quickText.trim()}
+            style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 10, background: quickText.trim() ? 'var(--primary)' : 'var(--bg-input)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: quickText.trim() ? '#fff' : 'var(--text-faint)', transition: 'background .15s' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
           </button>
         </div>
@@ -501,9 +454,9 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
           </div>
         )}
 
-        <button onClick={doAdd} disabled={adding || !addName.trim()}
-          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: adding || !addName.trim() ? 0.6 : 1 }}>
-          {adding ? '...' : addType === 'task' ? t('add_task') : t('add_sublist')}
+        <button onClick={doAdd} disabled={!addName.trim()}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !addName.trim() ? 0.6 : 1 }}>
+          {addType === 'task' ? t('add_task') : t('add_sublist')}
         </button>
       </Sheet>
 
@@ -537,9 +490,9 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
             <div style={{ position: 'absolute', width: 18, height: 18, borderRadius: '50%', background: '#fff', top: 2, left: editShared ? 20 : 2, transition: 'left .2s' }} />
           </div>
         </div>
-        <button onClick={saveEdit} disabled={saving || !editName.trim()}
-          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: saving || !editName.trim() ? 0.6 : 1 }}>
-          {saving ? t('saving') : t('save')}
+        <button onClick={saveEdit} disabled={!editName.trim()}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !editName.trim() ? 0.6 : 1 }}>
+          {t('save')}
         </button>
       </Sheet>
 
@@ -575,9 +528,9 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
 
       <Sheet open={showDelete} onClose={() => setShowDelete(false)} title={t('delete_list_confirm')}>
         <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>{t('delete_list_sub')}</p>
-        <button onClick={confirmDelete} disabled={deleting}
-          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--danger)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', marginBottom: 10, opacity: deleting ? 0.6 : 1 }}>
-          {deleting ? '...' : t('delete_list')}
+        <button onClick={confirmDelete}
+          style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--danger)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', marginBottom: 10 }}>
+          {t('delete_list')}
         </button>
         <button onClick={() => setShowDelete(false)}
           style={{ width: '100%', padding: 13, borderRadius: 10, background: 'var(--bg)', color: 'var(--text-muted)', border: '0.5px solid var(--border)', fontSize: 17, cursor: 'pointer' }}>
