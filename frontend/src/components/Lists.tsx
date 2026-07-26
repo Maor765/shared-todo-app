@@ -307,6 +307,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             <IconBtn
               icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"
               onClick={() => setShowSearch((s) => !s)}
+              size={{ svg: 22, btn: 40 }}
             />
             <IconBtn
               icon="M12 5v14M5 12h14"

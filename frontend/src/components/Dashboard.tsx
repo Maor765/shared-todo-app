@@ -82,7 +82,7 @@ export default function Dashboard() {
         sub={`${greeting}, ${auth.user?.name.split(' ')[0]} 👋`}
         right={
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <IconBtn icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" onClick={() => { setShowSearch((s) => !s); setSearch(''); }} />
+            <IconBtn icon="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" onClick={() => { setShowSearch((s) => !s); setSearch(''); }} size={{ svg: 22, btn: 40 }} />
             {auth.user && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
                 <Avatar member={auth.user} size={24} />
