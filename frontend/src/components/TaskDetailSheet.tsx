@@ -3,7 +3,7 @@ import { DBTask } from '../types';
 import { Sheet } from './ui/Sheet';
 import { CheckCircle } from './ui/CheckCircle';
 import { useSettings } from '../context/SettingsContext';
-import { tasksAPI } from '../api/tasks.api';
+import { useTaskMutations } from '../hooks/useOfflineMutations';
 import { useListDetail } from '../hooks/useLists';
 
 interface TaskDetailSheetProps {
@@ -14,28 +14,27 @@ interface TaskDetailSheetProps {
 export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelete }: TaskDetailSheetProps) {
   const { list } = useListDetail(listId);
   const { t } = useSettings();
+  const { updateTask, deleteTask, toggleTask } = useTaskMutations();
   const [text, setText] = useState(task.text);
   const [notes, setNotes] = useState(task.notes || '');
   const [assigneeId, setAssigneeId] = useState(task.assignee_id);
   const [due, setDue] = useState(task.due ? task.due.slice(0, 10) : '');
   const [sublistId, setSublistId] = useState(task.sublist_id);
   const [amount, setAmount] = useState(task.amount != null ? String(task.amount) : '');
-  const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
-    setSaving(true);
-    try { await tasksAPI.updateTask(listId, task.id, { text, notes, assignee_id: assigneeId, due: due || null, sublist_id: sublistId, amount: amount !== '' ? parseFloat(amount) : null }); onSave(); }
-    catch {} finally { setSaving(false); }
+  const handleSave = () => {
+    updateTask(listId, task.id, { text, notes, assignee_id: assigneeId, due: due || null, sublist_id: sublistId, amount: amount !== '' ? parseFloat(amount) : null });
+    onSave();
   };
 
-  const handleDelete = async () => {
-    try { await tasksAPI.deleteTask(listId, task.id); onDelete(); } catch {}
+  const handleDelete = () => {
+    deleteTask(listId, task.id);
+    onDelete();
   };
 
-  const handleToggleDone = async () => {
-    setSaving(true);
-    try { await tasksAPI.updateTask(listId, task.id, { done: !task.done }); onSave(); }
-    catch {} finally { setSaving(false); }
+  const handleToggleDone = () => {
+    toggleTask(listId, task.id, task.done);
+    onSave();
   };
 
   if (!list) return null;
@@ -104,9 +103,9 @@ export default function TaskDetailSheet({ task, listId, onClose, onSave, onDelet
       )}
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={handleSave} disabled={saving}
-          style={{ flex: 1, padding: 12, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
-          {saving ? t('saving') : t('save')}
+        <button onClick={handleSave}
+          style={{ flex: 1, padding: 12, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer' }}>
+          {t('save')}
         </button>
         <button onClick={handleDelete}
           style={{ width: 48, height: 48, borderRadius: 10, background: 'var(--danger-bg)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
