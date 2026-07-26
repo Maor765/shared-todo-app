@@ -10,3 +10,8 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+export function clearPersistedCache() {
+  queryClient.clear();
+  localStorage.removeItem(QUERY_CACHE_KEY);
+}

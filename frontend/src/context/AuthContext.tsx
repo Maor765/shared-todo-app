@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { PublicUser, WorkspaceInvite } from '../types';
 import client from '../api/client';
+import { clearPersistedCache } from '../lib/queryClient';
 
 export interface AuthContextValue {
   user: PublicUser | null;
@@ -125,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   function logout() {
     clearSession();
+    clearPersistedCache();
     setToken(null);
     setUser(null);
     setWorkspace(null);

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { onlineManager } from '@tanstack/react-query';
+import { clearPersistedCache } from '../lib/queryClient';
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -31,6 +32,7 @@ client.interceptors.response.use(
     }
     if (error.response?.status === 401) {
       localStorage.removeItem('todo_token');
+      clearPersistedCache();
       window.location.href = '/login';
     }
     return Promise.reject(error);
