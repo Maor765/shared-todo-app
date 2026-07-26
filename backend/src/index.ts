@@ -34,8 +34,13 @@ initListsIO(io);
 initTasksIO(io);
 initSublistsIO(io);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date() });
+app.get('/api/health', async (req, res) => {
+  try {
+    await query('SELECT 1');
+    res.json({ status: 'ok', timestamp: new Date() });
+  } catch (error) {
+    res.status(503).json({ status: 'error', timestamp: new Date() });
+  }
 });
 
 app.use('/api/auth', authRoutes);
