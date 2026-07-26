@@ -16,7 +16,7 @@ export default function ResetPasswordPage() {
 
   const inputStyle = {
     width: '100%', height: 40, borderRadius: 10, background: 'var(--bg-card)',
-    border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 15,
+    border: '0.5px solid var(--border)', padding: '0 12px', fontSize: 16,
     marginBottom: 12, outline: 'none', color: 'var(--text)',
   } as const;
 
@@ -40,9 +40,9 @@ export default function ResetPasswordPage() {
   if (!token) {
     return (
       <div style={{ width: '100%', maxWidth: 480, minHeight: '100dvh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 24, textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>⚠️</div>
-        <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>{t('invalid_reset_link')}</p>
-        <Link to="/forgot-password" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 14 }}>{t('request_new_link')}</Link>
+        <div style={{ fontSize: 51 }}>⚠️</div>
+        <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>{t('invalid_reset_link')}</p>
+        <Link to="/forgot-password" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 15 }}>{t('request_new_link')}</Link>
       </div>
     );
   }
@@ -51,11 +51,11 @@ export default function ResetPasswordPage() {
     <div style={{ width: '100%', maxWidth: 480, minHeight: '100dvh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px 24px', textAlign: 'center' }}>
 
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{success ? '✅' : '🔒'}</div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>
+        <div style={{ fontSize: 51, marginBottom: 16 }}>{success ? '✅' : '🔒'}</div>
+        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>
           {success ? t('password_reset_success') : t('new_password')}
         </h1>
-        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 28 }}>
+        <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 28 }}>
           {success ? t('redirecting_login') : t('new_password_sub')}
         </p>
 
@@ -69,16 +69,16 @@ export default function ResetPasswordPage() {
               type="password" placeholder={t('confirm_password_ph')} value={confirm}
               onChange={(e) => setConfirm(e.target.value)} required style={{ ...inputStyle, marginBottom: 16 }}
             />
-            {error && <div style={{ color: 'var(--danger)', fontSize: 14, marginBottom: 12 }}>{error}</div>}
+            {error && <div style={{ color: 'var(--danger)', fontSize: 15, marginBottom: 12 }}>{error}</div>}
             <button type="submit" disabled={loading || !password || !confirm}
-              style={{ width: '100%', height: 40, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: loading || !password || !confirm ? 0.6 : 1 }}>
+              style={{ width: '100%', height: 40, borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: loading || !password || !confirm ? 0.6 : 1 }}>
               {loading ? '...' : t('reset_password')}
             </button>
           </form>
         )}
 
         {!success && (
-          <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 24 }}>
+          <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 24 }}>
             <Link to="/login" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
               ← {t('back_to_login')}
             </Link>

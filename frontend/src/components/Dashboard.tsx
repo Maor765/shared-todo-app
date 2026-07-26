@@ -86,7 +86,7 @@ export default function Dashboard() {
             {auth.user && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg)', borderRadius: 999, padding: '4px 10px 4px 4px', border: '0.5px solid var(--border)' }}>
                 <Avatar member={auth.user} size={24} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{auth.user.name.split(' ')[0]}</span>
               </div>
             )}
           </div>
@@ -100,8 +100,8 @@ export default function Dashboard() {
           </svg>
           <input autoFocus value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder={t('search_ph')}
-            style={{ border: 'none', background: 'none', fontSize: 17, color: 'var(--text)', outline: 'none', flex: 1 }} />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 20, padding: 2 }}>×</button>}
+            style={{ border: 'none', background: 'none', fontSize: 18, color: 'var(--text)', outline: 'none', flex: 1 }} />
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 21, padding: 2 }}>×</button>}
         </div>
       )}
       <FilterChips
@@ -128,8 +128,8 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.num}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
+                    <div style={{ fontSize: 26, fontWeight: 700, color: s.color }}>{s.num}</div>
+                    <div style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 1 }}>{s.lbl}</div>
                   </>
                 )}
               </div>
@@ -138,7 +138,7 @@ export default function Dashboard() {
         )}
 
         {!isLoading && (
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
             {search ? `${filtered.length} ${t('results')}` : filter === 'All' ? `${t('filter_all')} (${filtered.length})` : `${filtered.length}`}
           </div>
         )}
@@ -155,13 +155,13 @@ export default function Dashboard() {
           ))
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-faint)' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>✓</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
-            <div style={{ fontSize: 14, marginTop: 4 }}>{t('no_tasks_filter')}</div>
+            <div style={{ fontSize: 34, marginBottom: 8 }}>✓</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text-dim)' }}>{t('nothing_here')}</div>
+            <div style={{ fontSize: 15, marginTop: 4 }}>{t('no_tasks_filter')}</div>
             {search && (
               <button
                 onClick={() => setShowCreateTask(true)}
-                style={{ marginTop: 20, padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+                style={{ marginTop: 20, padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
               >
                 {t('create_task')} "{search}"
               </button>
@@ -184,14 +184,14 @@ export default function Dashboard() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{task.text}</span>
+                    <span style={{ fontSize: 16, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{task.text}</span>
                     {task.amount != null && (
-                      <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
+                      <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 14 }}>
                         {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
                 </div>
                 {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
                 {isDueSoon && <Badge variant="warn">{t('due_soon_badge')}</Badge>}
@@ -212,7 +212,7 @@ export default function Dashboard() {
       )}
 
       <Sheet open={showCreateTask} onClose={() => { setShowCreateTask(false); setSelectedListId(''); }} title={`${t('add_task')}: "${search}"`}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
           {t('select_list')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
@@ -226,7 +226,7 @@ export default function Dashboard() {
                 color: selectedListId === list.id ? 'var(--primary)' : 'var(--text)', fontWeight: 500
               }}
             >
-              <span style={{ fontSize: 16, marginRight: 8 }}>{list.emoji}</span>
+              <span style={{ fontSize: 17, marginRight: 8 }}>{list.emoji}</span>
               {list.name}
             </button>
           ))}
@@ -236,7 +236,7 @@ export default function Dashboard() {
           disabled={!selectedListId || creating}
           style={{
             width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
-            border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
           }}
         >
           {creating ? '...' : t('add_task')}

@@ -24,7 +24,7 @@ export default function AppShell() {
 
   if (auth.isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)', fontSize: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)', fontSize: 17 }}>
         {t('loading')}
       </div>
     );
@@ -32,9 +32,9 @@ export default function AppShell() {
 
   if (!auth.user || !auth.workspace) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 16, color: 'var(--text-muted)', fontSize: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 16, color: 'var(--text-muted)', fontSize: 17 }}>
         <div>{t('loading')}</div>
-        <button onClick={auth.logout} style={{ padding: '8px 20px', borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={auth.logout} style={{ padding: '8px 20px', borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
           {t('log_out')}
         </button>
       </div>

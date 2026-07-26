@@ -172,8 +172,8 @@ export default function Lists({ onSelectList }: ListsProps) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 22, flexShrink: 0 }}>{list.emoji}</span>
-            <span style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 23, flexShrink: 0 }}>{list.emoji}</span>
+            <span style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {list.name}
             </span>
           </div>
@@ -189,7 +189,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setMenuListId(isMenuOpen ? null : list.id); }}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 4px", borderRadius: 6, color: "var(--text-muted)", fontSize: 18, lineHeight: 1, display: "flex", alignItems: "center" }}
+              style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 4px", borderRadius: 6, color: "var(--text-muted)", fontSize: 19, lineHeight: 1, display: "flex", alignItems: "center" }}
             >
               <svg width="18" height="4" viewBox="0 0 18 4" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="9" cy="2" r="2"/><circle cx="16" cy="2" r="2"/></svg>
             </button>
@@ -202,7 +202,7 @@ export default function Lists({ onSelectList }: ListsProps) {
           >
             <button
               onClick={(e) => { e.stopPropagation(); openEdit(list); }}
-              style={{ width: "100%", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "var(--text)", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}
+              style={{ width: "100%", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--text)", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               {t("edit_list")}
@@ -210,7 +210,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             <div style={{ height: "0.5px", background: "var(--border)" }} />
             <button
               onClick={(e) => { e.stopPropagation(); setDeleteList(list); setMenuListId(null); }}
-              style={{ width: "100%", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 15, color: "var(--danger)", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}
+              style={{ width: "100%", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--danger)", textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
               {t("delete_list")}
@@ -223,7 +223,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             display: "flex",
             alignItems: "center",
             gap: 8,
-            fontSize: 14,
+            fontSize: 15,
             color: "var(--text-muted)",
           }}
         >
@@ -259,7 +259,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                   height: 20,
                   borderRadius: "50%",
                   background: "var(--bg)",
-                  fontSize: 9,
+                  fontSize: 10,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -280,7 +280,7 @@ export default function Lists({ onSelectList }: ListsProps) {
         />
         {taskCount > 0 && (
           <div
-            style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 4 }}
+            style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 4 }}
           >
             {doneCount}/{taskCount} {t("done_badge").toLowerCase()}
           </div>
@@ -349,13 +349,13 @@ export default function Lists({ onSelectList }: ListsProps) {
             style={{
               border: "none",
               background: "none",
-              fontSize: 17,
+              fontSize: 18,
               color: "var(--text)",
               outline: "none",
               flex: 1,
             }}
           />
-          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 20, padding: 2 }}>×</button>}
+          {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 21, padding: 2 }}>×</button>}
         </div>
       )}
 
@@ -364,7 +364,7 @@ export default function Lists({ onSelectList }: ListsProps) {
           <>
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
@@ -381,7 +381,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                   textAlign: "center",
                   padding: "40px 20px",
                   color: "var(--text-faint)",
-                  fontSize: 15,
+                  fontSize: 16,
                 }}
               >
                 <div style={{ marginBottom: 16 }}>{t("no_tasks_match")} "{search}"</div>
@@ -390,7 +390,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                     onClick={() => { setShowCreateTask(true); }}
                     style={{
                       padding: '8px 16px', borderRadius: 10, background: 'var(--primary)', color: '#fff',
-                      border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                      border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer'
                     }}
                   >
                     {t('add_task')} "{search}"
@@ -399,7 +399,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                     onClick={() => { setNewName(search); setShowCreate(true); setSearch(''); }}
                     style={{
                       padding: '8px 16px', borderRadius: 10, background: 'var(--bg-card)', color: 'var(--text)',
-                      border: '0.5px solid var(--border)', fontSize: 14, fontWeight: 600, cursor: 'pointer'
+                      border: '0.5px solid var(--border)', fontSize: 15, fontWeight: 600, cursor: 'pointer'
                     }}
                   >
                     {t('create_list')} "{search}"
@@ -457,7 +457,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
                           style={{
-                            fontSize: 16,
+                            fontSize: 17,
                             color: task.done ? "var(--text-faint)" : "var(--text)",
                             textDecoration: task.done ? "line-through" : "none",
                             lineHeight: 1.3,
@@ -466,14 +466,14 @@ export default function Lists({ onSelectList }: ListsProps) {
                           {task.text}
                         </span>
                         {task.amount != null && (
-                          <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 13 }}>
+                          <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 14 }}>
                             {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
                           </span>
                         )}
                       </div>
                       <div
                         style={{
-                          fontSize: 13,
+                          fontSize: 14,
                           color: "var(--text-muted)",
                           marginTop: 3,
                         }}
@@ -492,7 +492,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               <>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: "var(--text-faint)",
                     textTransform: "uppercase",
@@ -511,7 +511,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               <>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: "var(--text-faint)",
                     textTransform: "uppercase",
@@ -531,10 +531,10 @@ export default function Lists({ onSelectList }: ListsProps) {
 
         {!search && lists.length === 0 && (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <div style={{ fontSize: 42, marginBottom: 12 }}>📋</div>
+            <div style={{ fontSize: 45, marginBottom: 12 }}>📋</div>
             <div
               style={{
-                fontSize: 18,
+                fontSize: 19,
                 fontWeight: 600,
                 color: "var(--text)",
                 marginBottom: 6,
@@ -544,7 +544,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             </div>
             <div
               style={{
-                fontSize: 15,
+                fontSize: 16,
                 color: "var(--text-muted)",
                 lineHeight: 1.5,
                 marginBottom: 20,
@@ -560,7 +560,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                 border: "none",
                 borderRadius: 10,
                 padding: "10px 20px",
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: 600,
                 cursor: "pointer",
               }}
@@ -594,46 +594,46 @@ export default function Lists({ onSelectList }: ListsProps) {
 
       <Sheet open={!!editList} onClose={() => setEditList(null)} title={t("edit_list")}>
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4, fontWeight: 600 }}>{t("name_label")}</div>
+          <div style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 4, fontWeight: 600 }}>{t("name_label")}</div>
           <input
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             placeholder={t("list_ph")}
-            style={{ width: "100%", height: 38, borderRadius: 10, background: "var(--bg-input)", border: "0.5px solid var(--primary)", padding: "0 12px", fontSize: 16, color: "var(--text)", outline: "none" }}
+            style={{ width: "100%", height: 38, borderRadius: 10, background: "var(--bg-input)", border: "0.5px solid var(--primary)", padding: "0 12px", fontSize: 17, color: "var(--text)", outline: "none" }}
           />
         </div>
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: 600 }}>{t("emoji_label")}</div>
+          <div style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 8, fontWeight: 600 }}>{t("emoji_label")}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {EMOJIS.map((e, i) => (
               <button key={i} onClick={() => setEditEmoji(e)}
-                style={{ width: 36, height: 36, borderRadius: 8, fontSize: 20, cursor: "pointer", background: editEmoji === e ? "var(--primary-bg)" : "var(--bg-input)", border: editEmoji === e ? "2px solid var(--primary)" : "0.5px solid var(--border)" }}>
+                style={{ width: 36, height: 36, borderRadius: 8, fontSize: 21, cursor: "pointer", background: editEmoji === e ? "var(--primary-bg)" : "var(--bg-input)", border: editEmoji === e ? "2px solid var(--primary)" : "0.5px solid var(--border)" }}>
                 {e}
               </button>
             ))}
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "0.5px solid var(--border)", marginBottom: 16 }}>
-          <span style={{ fontSize: 16, color: "var(--text)" }}>{t("shared_with_team")}</span>
+          <span style={{ fontSize: 17, color: "var(--text)" }}>{t("shared_with_team")}</span>
           <div onClick={() => setEditShared((s) => !s)}
             style={{ width: 40, height: 22, borderRadius: 11, background: editShared ? "var(--primary)" : "var(--border)", position: "relative", cursor: "pointer", transition: "background .2s" }}>
             <div style={{ position: "absolute", width: 18, height: 18, borderRadius: "50%", background: "#fff", top: 2, left: editShared ? 20 : 2, transition: "left .2s" }} />
           </div>
         </div>
         <button onClick={saveEdit} disabled={saving || !editName.trim()}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--primary)", color: "#fff", border: "none", fontSize: 16, fontWeight: 600, cursor: "pointer", opacity: saving || !editName.trim() ? 0.6 : 1 }}>
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--primary)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", opacity: saving || !editName.trim() ? 0.6 : 1 }}>
           {saving ? t("saving") : t("save")}
         </button>
       </Sheet>
 
       <Sheet open={!!deleteList} onClose={() => setDeleteList(null)} title={t("delete_list_confirm")}>
-        <p style={{ fontSize: 15, color: "var(--text-muted)", marginBottom: 24, lineHeight: 1.6 }}>{t("delete_list_sub")}</p>
+        <p style={{ fontSize: 16, color: "var(--text-muted)", marginBottom: 24, lineHeight: 1.6 }}>{t("delete_list_sub")}</p>
         <button onClick={confirmDelete} disabled={deleting}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--danger)", color: "#fff", border: "none", fontSize: 16, fontWeight: 600, cursor: "pointer", marginBottom: 10, opacity: deleting ? 0.6 : 1 }}>
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--danger)", color: "#fff", border: "none", fontSize: 17, fontWeight: 600, cursor: "pointer", marginBottom: 10, opacity: deleting ? 0.6 : 1 }}>
           {deleting ? "..." : t("delete_list")}
         </button>
         <button onClick={() => setDeleteList(null)}
-          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--bg)", color: "var(--text-muted)", border: "0.5px solid var(--border)", fontSize: 16, cursor: "pointer" }}>
+          style={{ width: "100%", padding: 13, borderRadius: 10, background: "var(--bg)", color: "var(--text-muted)", border: "0.5px solid var(--border)", fontSize: 17, cursor: "pointer" }}>
           {t("cancel")}
         </button>
       </Sheet>
@@ -646,7 +646,7 @@ export default function Lists({ onSelectList }: ListsProps) {
         <div style={{ marginBottom: 14 }}>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               color: "var(--text-muted)",
               marginBottom: 4,
               fontWeight: 600,
@@ -665,7 +665,7 @@ export default function Lists({ onSelectList }: ListsProps) {
               background: "var(--bg-input)",
               border: "0.5px solid var(--primary)",
               padding: "0 12px",
-              fontSize: 16,
+              fontSize: 17,
               color: "var(--text)",
               outline: "none",
             }}
@@ -675,7 +675,7 @@ export default function Lists({ onSelectList }: ListsProps) {
         <div style={{ marginBottom: 14 }}>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               color: "var(--text-muted)",
               marginBottom: 8,
               fontWeight: 600,
@@ -692,7 +692,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                   width: 36,
                   height: 36,
                   borderRadius: 8,
-                  fontSize: 20,
+                  fontSize: 21,
                   cursor: "pointer",
                   background:
                     newEmoji === e ? "var(--primary-bg)" : "var(--bg-input)",
@@ -718,7 +718,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             marginBottom: 16,
           }}
         >
-          <span style={{ fontSize: 16, color: "var(--text)" }}>
+          <span style={{ fontSize: 17, color: "var(--text)" }}>
             {t("shared_with_team")}
           </span>
           <div
@@ -757,7 +757,7 @@ export default function Lists({ onSelectList }: ListsProps) {
             background: "var(--primary)",
             color: "#fff",
             border: "none",
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: 600,
             cursor: "pointer",
           }}
@@ -767,7 +767,7 @@ export default function Lists({ onSelectList }: ListsProps) {
       </Sheet>
 
       <Sheet open={showCreateTask} onClose={() => { setShowCreateTask(false); setSelectedListId(''); }} title={`${t('add_task')}: "${search}"`}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-faint)', marginBottom: 12, textTransform: 'uppercase' }}>
           {t('select_list')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
@@ -781,7 +781,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                 color: selectedListId === list.id ? 'var(--primary)' : 'var(--text)', fontWeight: 500
               }}
             >
-              <span style={{ fontSize: 16, marginRight: 8 }}>{list.emoji}</span>
+              <span style={{ fontSize: 17, marginRight: 8 }}>{list.emoji}</span>
               {list.name}
             </button>
           ))}
@@ -791,7 +791,7 @@ export default function Lists({ onSelectList }: ListsProps) {
           disabled={!selectedListId || creating}
           style={{
             width: '100%', padding: 13, borderRadius: 10, background: 'var(--primary)', color: '#fff',
-            border: 'none', fontSize: 16, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
+            border: 'none', fontSize: 17, fontWeight: 600, cursor: 'pointer', opacity: !selectedListId || creating ? 0.6 : 1
           }}
         >
           {creating ? '...' : t('add_task')}
