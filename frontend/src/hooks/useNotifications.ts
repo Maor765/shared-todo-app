@@ -10,6 +10,7 @@ export function useNotifications() {
     queryKey: ['notifications'],
     queryFn: () => notificationsAPI.getNotifications().then((r) => r.data as DBNotification[]),
     staleTime: 2 * 60 * 1000,
+    gcTime: Infinity,
   });
 
   useSocketEvent('notification:new', ({ notification }: { notification: DBNotification }) => {

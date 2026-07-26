@@ -29,12 +29,14 @@ export default function Team() {
     queryKey: ['members'],
     queryFn: () => workspaceAPI.getMembers().then((r) => r.data),
     staleTime: 5 * 60 * 1000,
+    gcTime: Infinity,
   });
 
   const { data: invites = [] } = useQuery<PendingInvite[]>({
     queryKey: ['invites'],
     queryFn: () => membersAPI.getInvites().then((r) => r.data),
     staleTime: 5 * 60 * 1000,
+    gcTime: Infinity,
   });
 
   useSocketEvent('member:status', ({ user_id, status }: { user_id: string; status: string }) => {
