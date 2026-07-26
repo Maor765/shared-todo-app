@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../context/SettingsContext';
 import { NavBar } from '../components/ui/NavBar';
 import { ToastStack } from '../components/ui/ToastStack';
+import { OfflineBanner } from '../components/ui/OfflineBanner';
 import Dashboard from '../components/Dashboard';
 import Lists from '../components/Lists';
 import ListDetail from '../components/ListDetail';
@@ -73,6 +74,7 @@ export default function AppShell() {
         overflow: 'hidden',
       }}
     >
+      <OfflineBanner />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
         {renderScreen()}
       </div>

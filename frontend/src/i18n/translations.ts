@@ -51,6 +51,7 @@ const en: T = {
   // ListDetail
   back_lists: 'Lists', no_tasks_yet: 'No tasks yet',
   add_task_sublist: 'Add sublist or task...', add_to: 'Add to', add_item_ph: 'Add item...',
+  offline_banner: 'Offline — changes will sync when you\'re back online',
   type_task: 'Task', type_sublist: 'Sublist',
   single_todo: 'A single to-do', group_tasks: 'A group of tasks',
   task_name: 'Task name', sublist_name: 'Sublist name',
@@ -123,6 +124,7 @@ const he: T = {
   delete_list_confirm: 'למחוק את הרשימה?', delete_list_sub: 'פעולה זו תמחק לצמיתות את כל המשימות ברשימה.',
   back_lists: 'רשימות', no_tasks_yet: 'אין משימות עדיין',
   add_task_sublist: '...הוסף תת-רשימה או משימה', add_to: 'הוסף ל', add_item_ph: '...הוסף פריט',
+  offline_banner: 'לא מחובר — שינויים יסונכרנו כשהחיבור יחזור',
   type_task: 'משימה', type_sublist: 'תת-רשימה',
   single_todo: 'מטלה בודדת', group_tasks: 'קבוצת משימות',
   task_name: 'שם המשימה', sublist_name: 'שם תת-הרשימה',
