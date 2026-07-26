@@ -116,17 +116,19 @@ export default function Lists({ onSelectList }: ListsProps) {
     const taskCount = list.tasks?.length || 0;
     const doneCount = list.tasks?.filter((task) => task.done).length || 0;
     const isMenuOpen = menuListId === list.id;
+    const isTemp = isTempId(list.id);
     return (
       <div
-        onClick={() => { if (isMenuOpen) { setMenuListId(null); return; } onSelectList(list.id); }}
+        onClick={() => { if (isTemp) return; if (isMenuOpen) { setMenuListId(null); return; } onSelectList(list.id); }}
         style={{
           background: "var(--bg-card)",
           borderRadius: 14,
           border: "0.5px solid var(--border)",
           padding: 14,
           marginBottom: 10,
-          cursor: "pointer",
+          cursor: isTemp ? "default" : "pointer",
           position: "relative",
+          opacity: isTemp ? 0.5 : 1,
         }}
       >
         <div
@@ -140,7 +142,7 @@ export default function Lists({ onSelectList }: ListsProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
             <span style={{ fontSize: 23, flexShrink: 0 }}>{list.emoji}</span>
             <span style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {list.name}
+              {list.name}{isTemp ? ' (syncing…)' : ''}
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
@@ -399,7 +401,7 @@ export default function Lists({ onSelectList }: ListsProps) {
                     }}
                   >
                     <div
-                      onClick={(e) => { e.stopPropagation(); toggleTask(task, list.id); }}
+                      onClick={(e) => { e.stopPropagation(); if (!isTempId(task.id)) toggleTask(task, list.id); }}
                       style={{
                         width: 22,
                         height: 22,
@@ -411,7 +413,8 @@ export default function Lists({ onSelectList }: ListsProps) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        cursor: "pointer",
+                        cursor: isTempId(task.id) ? "default" : "pointer",
+                        opacity: isTempId(task.id) ? 0.5 : 1,
                       }}
                     >
                       {task.done && (

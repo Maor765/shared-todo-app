@@ -191,24 +191,25 @@ export default function ListDetail({ listId, onBack }: ListDetailProps) {
   const looseTasks = applySort(list.tasks.filter((task) => !task.sublist_id && filterTask(task)));
 
   const SortableTaskRow = ({ task }: { task: DBTask }) => {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
+    const isTemp = isTempId(task.id);
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id, disabled: isTemp });
     const isOverdue = task.due && task.due < today && !task.done;
     const isDueSoon = task.due && task.due >= today && !task.done;
     const assignee = list.members?.find((m) => m.id === task.assignee_id);
     return (
-      <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--border-subtle)' }}>
+      <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : isTemp ? 0.5 : 1, display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '0.5px solid var(--border-subtle)' }}>
         {activeSort === 'default' && (
-          <div {...attributes} {...listeners} style={{ color: 'var(--text-faint)', cursor: 'grab', paddingTop: 3, flexShrink: 0, touchAction: 'none' }}>
+          <div {...attributes} {...listeners} style={{ color: 'var(--text-faint)', cursor: isTemp ? 'default' : 'grab', paddingTop: 3, flexShrink: 0, touchAction: 'none' }}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="3" r="1.3"/><circle cx="11" cy="3" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="13" r="1.3"/><circle cx="11" cy="13" r="1.3"/></svg>
           </div>
         )}
-        <div onClick={() => setTaskSheet(task)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, cursor: 'pointer', minWidth: 0 }}>
+        <div onClick={() => !isTemp && setTaskSheet(task)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, cursor: isTemp ? 'default' : 'pointer', minWidth: 0 }}>
           <div onClick={(e) => e.stopPropagation()}>
-            <CheckCircle done={task.done} onToggle={() => toggleTask(task.id)} />
+            <CheckCircle done={task.done} onToggle={() => !isTemp && toggleTask(task.id)} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 18, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}</span>
+              <span style={{ fontSize: 18, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.text}{isTemp ? ' (syncing…)' : ''}</span>
               {task.amount != null && (
                 <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 14 }}>
                   {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}

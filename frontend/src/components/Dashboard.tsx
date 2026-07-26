@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLists } from '../hooks/useLists';
-import { useTaskMutations } from '../hooks/useOfflineMutations';
+import { useTaskMutations, isTempId } from '../hooks/useOfflineMutations';
 import { useSettings } from '../context/SettingsContext';
 import { DBTask } from '../types';
 import { TopBar } from './ui/TopBar';
@@ -153,15 +153,15 @@ export default function Dashboard() {
             return (
               <div
                 key={task.id}
-                onClick={() => setTaskSheet(task)}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8, cursor: 'pointer' }}
+                onClick={() => !isTempId(task.id) && setTaskSheet(task)}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8, cursor: isTempId(task.id) ? 'default' : 'pointer', opacity: isTempId(task.id) ? 0.5 : 1 }}
               >
-                <div onClick={(e) => { e.stopPropagation(); toggleTask(task.list_id, task.id, task.done); }}>
-                  <CheckCircle done={task.done} onToggle={() => toggleTask(task.list_id, task.id, task.done)} />
+                <div onClick={(e) => { e.stopPropagation(); if (!isTempId(task.id)) toggleTask(task.list_id, task.id, task.done); }}>
+                  <CheckCircle done={task.done} onToggle={() => !isTempId(task.id) && toggleTask(task.list_id, task.id, task.done)} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <span style={{ fontSize: 16, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{task.text}</span>
+                    <span style={{ fontSize: 16, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{isTempId(task.id) ? `${task.text} (syncing…)` : task.text}</span>
                     {task.amount != null && (
                       <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 14 }}>
                         {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
