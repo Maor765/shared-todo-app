@@ -28,10 +28,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       auth: {
         token: auth.token,
       },
+      // No reconnectionAttempts cap: Render free-tier cold starts can take ~30s
+      // to respond, and a 5-attempt cap (~15s) gives up before that, leaving the
+      // tab permanently unable to receive other users' live updates until reload.
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
     });
 
     newSocket.on('connect', () => {
