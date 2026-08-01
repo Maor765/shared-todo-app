@@ -5,6 +5,12 @@ The original design (inline styles, 390px phone shell, component patterns) lives
 
 ---
 
+## Workflow
+
+After making a code change (bug fix, feature, refactor), commit it — don't leave finished changes sitting uncommitted. Use a normal commit message describing the change. Do not push unless separately asked.
+
+---
+
 ## Stack
 
 | Layer | Technology |
