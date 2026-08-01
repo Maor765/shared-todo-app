@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { listsAPI } from '../api/lists.api';
 import { ListWithMembers, ListDetail, DBTask, DBSublist } from '../types';
 import { useSocketEvent } from './useSocket';
+import { upsertTask, upsertList, upsertSublist } from '../lib/cachePatches';
 
 export function useLists() {
   const queryClient = useQueryClient();
@@ -28,7 +29,7 @@ export function useLists() {
   );
 
   useSocketEvent('list:created', ({ list }: { list: ListWithMembers }) => {
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) => [...(prev ?? []), list]);
+    upsertList(queryClient, list);
   });
 
   useSocketEvent('list:deleted', ({ list_id }: { list_id: string }) => {
@@ -36,9 +37,7 @@ export function useLists() {
   });
 
   useSocketEvent('task:created', ({ task, list_id }: { task: DBTask; list_id: string }) => {
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-      (prev ?? []).map((l) => (l.id === list_id ? { ...l, tasks: [...(l.tasks || []), task] } : l)),
-    );
+    upsertTask(queryClient, list_id, task);
   });
 
   useSocketEvent('task:updated', ({ task, list_id }: { task: DBTask; list_id: string }) => {
@@ -73,13 +72,8 @@ export function useListDetail(listId: string) {
 
   useSocketEvent('task:created', ({ task, list_id }: { task: DBTask; list_id: string }) => {
     if (list_id !== listId) return;
-    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
-      prev ? { ...prev, tasks: [...prev.tasks, task] } : prev,
-    );
-    // Mirror to ['lists'] so Dashboard stays current when useLists is not mounted
-    queryClient.setQueryData<ListWithMembers[]>(['lists'], (prev) =>
-      (prev ?? []).map((l) => (l.id === list_id ? { ...l, tasks: [...(l.tasks || []), task] } : l)),
-    );
+    // upsertTask also mirrors to ['lists'] so Dashboard stays current when useLists is not mounted
+    upsertTask(queryClient, list_id, task);
   });
 
   useSocketEvent('task:updated', ({ task, list_id }: { task: DBTask; list_id: string }) => {
@@ -126,9 +120,7 @@ export function useListDetail(listId: string) {
 
   useSocketEvent('sublist:created', ({ sublist, list_id }: { sublist: DBSublist; list_id: string }) => {
     if (list_id !== listId) return;
-    queryClient.setQueryData<ListDetail>(['list', listId], (prev) =>
-      prev ? { ...prev, sublists: [...prev.sublists, sublist] } : prev,
-    );
+    upsertSublist(queryClient, list_id, sublist);
   });
 
   useSocketEvent('sublist:deleted', ({ sublist_id, list_id }: { sublist_id: string; list_id: string }) => {
