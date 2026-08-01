@@ -154,21 +154,21 @@ export default function Dashboard() {
               <div
                 key={task.id}
                 onClick={() => !isTempId(task.id) && setTaskSheet(task)}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8, cursor: isTempId(task.id) ? 'default' : 'pointer', opacity: isTempId(task.id) ? 0.5 : 1 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 12px', background: 'var(--bg-card)', borderRadius: 12, border: '0.5px solid var(--border)', marginBottom: 8, cursor: isTempId(task.id) ? 'default' : 'pointer', opacity: isTempId(task.id) ? 0.5 : 1 }}
               >
                 <div onClick={(e) => { e.stopPropagation(); if (!isTempId(task.id)) toggleTask(task.list_id, task.id, task.done); }}>
                   <CheckCircle done={task.done} onToggle={() => !isTempId(task.id) && toggleTask(task.list_id, task.id, task.done)} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <span style={{ fontSize: 16, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{isTempId(task.id) ? `${task.text} (syncing…)` : task.text}</span>
+                    <span style={{ fontSize: 17, color: task.done ? 'var(--text-muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{isTempId(task.id) ? `${task.text} (syncing…)` : task.text}</span>
                     {task.amount != null && (
                       <span style={{ flexShrink: 0, background: 'var(--bg)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '1px 7px', fontWeight: 600, color: 'var(--text-dim)', fontSize: 14 }}>
                         {task.amount % 1 === 0 ? task.amount : task.amount.toFixed(2)}
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 14, color: 'var(--text-faint)', marginTop: 2 }}>{breadcrumb}</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-faint)', marginTop: 3 }}>{breadcrumb}</div>
                 </div>
                 {isOverdue && <Badge variant="danger">{t('overdue_badge')}</Badge>}
                 {isDueSoon && <Badge variant="warn">{t('due_soon_badge')}</Badge>}
@@ -198,13 +198,14 @@ export default function Dashboard() {
               key={list.id}
               onClick={() => setSelectedListId(list.id)}
               style={{
+                display: 'flex', alignItems: 'center', gap: 12,
                 padding: '12px 14px', borderRadius: 10, border: selectedListId === list.id ? '2px solid var(--primary)' : '0.5px solid var(--border)',
                 background: selectedListId === list.id ? 'var(--primary-bg)' : 'var(--bg-card)', cursor: 'pointer', textAlign: 'left',
                 color: selectedListId === list.id ? 'var(--primary)' : 'var(--text)', fontWeight: 500
               }}
             >
-              <span style={{ fontSize: 17, marginRight: 8 }}>{list.emoji}</span>
-              {list.name}
+              <span style={{ fontSize: 19 }}>{list.emoji}</span>
+              <span style={{ fontSize: 16 }}>{list.name}</span>
             </button>
           ))}
         </div>
