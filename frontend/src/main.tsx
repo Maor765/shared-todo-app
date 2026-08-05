@@ -16,6 +16,13 @@ const persister = createSyncStoragePersister({
   key: QUERY_CACHE_KEY,
 });
 
+// PROD-only: a cached dev bundle would fight Vite's HMR module requests.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
